@@ -1,6 +1,8 @@
 import pygame
-from ship import Ship
-from enemy import Enemy
+from .ship import Ship
+from .enemy import Enemy
+
+pygame.init()
 
 
 def fill_background(screen_size):
@@ -94,10 +96,3 @@ class Game_Information:
         self.ammo = ammo
         self.ship_x = ship_rect.centerx
         self.enemy_x = enemy_rect.centerx
-
-
-if __name__ == '__main__':
-    pygame.init()
-    game = Game()
-    game.run()
-    pygame.quit()

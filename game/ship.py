@@ -1,6 +1,6 @@
 import pygame
-from utils import scale_image
-from laser import Laser
+from .utils import scale_image
+from .laser import Laser
 
 
 class Ship(pygame.sprite.Sprite):

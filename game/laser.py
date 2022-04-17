@@ -1,5 +1,5 @@
 import pygame
-from utils import scale_image
+from .utils import scale_image
 
 
 class Laser(pygame.sprite.Sprite):
