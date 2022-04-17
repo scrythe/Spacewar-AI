@@ -31,8 +31,9 @@ class Game:
         self.background = fill_background(self.SCREEN_SIZE)
         self.background_rect = self.background.get_rect()
 
-        self.ship = Ship(self.screen_rect)
-        self.player = pygame.sprite.GroupSingle(self.ship)
+        ship = Ship(self.screen_rect)
+        self.player = pygame.sprite.GroupSingle(ship)
+        self.player_ship: Ship = self.player.sprite
 
     def run(self):
         while self.running:
@@ -46,12 +47,15 @@ class Game:
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 self.running = False
+            if event.type == pygame.KEYDOWN and event.key == pygame.K_SPACE:
+                self.player_ship.shoot_laser()
 
     def update(self):
         self.player.update()
 
     def draw(self, screen: pygame.Surface):
         screen.blit(self.background, self.background_rect)
+        self.player_ship.lasers.draw(screen)
         self.player.draw(screen)
 
 
