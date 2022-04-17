@@ -22,11 +22,11 @@ class Game:
     TOTAL_WIDTH = 1280
     TOTAL_HEIGHT = 720
     SCREEN_SIZE = TOTAL_WIDTH, TOTAL_HEIGHT
-    FPS = 60
 
-    def __init__(self):
+    def __init__(self, allow_keys=True):
+        self.allow_keys = allow_keys
         self.running = True
-        self.clock = pygame.time.Clock()
+        # self.clock = pygame.time.Clock()
         self.screen = pygame.display.set_mode(
             self.SCREEN_SIZE)
         self.screen_rect = self.screen.get_rect()
@@ -34,7 +34,7 @@ class Game:
         self.background = fill_background(self.SCREEN_SIZE)
         self.background_rect = self.background.get_rect()
 
-        ship = Ship(self.screen_rect)
+        ship = Ship(self.screen_rect, self.allow_keys)
         self.player = pygame.sprite.GroupSingle(ship)
         self.player_ship: Ship = self.player.sprite
 
@@ -42,20 +42,21 @@ class Game:
 
         self.hits = 0
 
-    def run(self):
-        while self.running:
-            self.event_loop()
-            self.update()
-            self.draw(self.screen)
-            pygame.display.flip()
-            self.clock.tick(self.FPS)
+    # def run(self):
+    #     while self.running:
+    #         self.event_loop()
+    #         self.update()
+    #         self.draw(self.screen)
+    #         pygame.display.flip()
+    #         self.clock.tick(self.FPS)
 
     def event_loop(self):
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 self.running = False
-            if event.type == pygame.KEYDOWN and event.key == pygame.K_SPACE:
-                self.player_ship.shoot_laser()
+            if self.allow_keys:
+                if event.type == pygame.KEYDOWN and event.key == pygame.K_SPACE:
+                    self.player_ship.shoot_laser()
 
     def collision(self):
         if pygame.sprite.groupcollide(self.player_ship.lasers, self.enemies, False, False):
