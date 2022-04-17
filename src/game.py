@@ -1,4 +1,5 @@
 import pygame
+from ship import Ship
 
 
 def fill_background(screen_size):
@@ -30,6 +31,9 @@ class Game:
         self.background = fill_background(self.SCREEN_SIZE)
         self.background_rect = self.background.get_rect()
 
+        self.ship = Ship(self.screen_rect)
+        self.player = pygame.sprite.GroupSingle(self.ship)
+
     def run(self):
         while self.running:
             self.event_loop()
@@ -48,6 +52,7 @@ class Game:
 
     def draw(self, screen: pygame.Surface):
         screen.blit(self.background, self.background_rect)
+        self.player.draw(screen)
 
 
 if __name__ == '__main__':
