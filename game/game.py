@@ -19,19 +19,16 @@ def fill_background(screen_size):
 
 
 class Game:
-    TOTAL_WIDTH = 1280
-    TOTAL_HEIGHT = 720
-    SCREEN_SIZE = TOTAL_WIDTH, TOTAL_HEIGHT
-
-    def __init__(self, allow_keys=True):
+    def __init__(self, screen_size, allow_keys=True):
         self.allow_keys = allow_keys
         self.running = True
         # self.clock = pygame.time.Clock()
+        self.screen_size = screen_size
         self.screen = pygame.display.set_mode(
-            self.SCREEN_SIZE)
+            self.screen_size)
         self.screen_rect = self.screen.get_rect()
 
-        self.background = fill_background(self.SCREEN_SIZE)
+        self.background = fill_background(self.screen_size)
         self.background_rect = self.background.get_rect()
 
         ship = Ship(self.screen_rect, self.allow_keys)
@@ -41,6 +38,7 @@ class Game:
         self.enemies = pygame.sprite.Group(Enemy(self.screen_rect))
 
         self.hits = 0
+        self.shot_distance_from_hits = []
 
     # def run(self):
     #     while self.running:
@@ -50,6 +48,11 @@ class Game:
     #         pygame.display.flip()
     #         self.clock.tick(self.FPS)
 
+    def get_distance_from_enemy(self):
+        distance_diffrence = self.player_ship.rect.centerx - \
+            self.get_first_enemy().rect.centerx
+        return abs(distance_diffrence)
+
     def event_loop(self):
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
@@ -57,6 +60,16 @@ class Game:
             if self.allow_keys:
                 if event.type == pygame.KEYDOWN and event.key == pygame.K_SPACE:
                     self.player_ship.shoot_laser()
+
+    def ship_shoot_laser(self):
+        if self.player_ship.shoot_laser():
+            self.shot_distance_from_hits.append(self.get_distance_from_enemy())
+
+    def move_ship_right(self):
+        self.player_ship.move_right()
+
+    def move_ship_left(self):
+        self.player_ship.move_left()
 
     def collision(self):
         if pygame.sprite.groupcollide(self.player_ship.lasers, self.enemies, False, False):
@@ -84,18 +97,24 @@ class Game:
         enemy: Enemy = self.enemies.sprites()[0]
         return enemy
 
+    def distance_between_enemy(self):
+        self.player_ship.lasers
+
     def get_game_information(self):
         ammo = self.player_ship.ammo
         ship_rect = self.player_ship.rect
         enemy_rect = self.get_first_enemy().rect
         hits = self.hits
-        game_info = Game_Information(ammo, ship_rect, enemy_rect, hits)
+        shot_distance_from_hits = self.shot_distance_from_hits
+        game_info = Game_Information(
+            ammo, ship_rect, enemy_rect, hits, shot_distance_from_hits)
         return game_info
 
 
 class Game_Information:
-    def __init__(self, ammo, ship_rect: pygame.Rect, enemy_rect: pygame.Rect, hits):
+    def __init__(self, ammo, ship_rect: pygame.Rect, enemy_rect: pygame.Rect, hits, shot_distance_from_hits):
         self.ammo = ammo
         self.ship_x = ship_rect.centerx
         self.enemy_x = enemy_rect.centerx
         self.hits = hits
+        self.shot_distance_from_hits = shot_distance_from_hits

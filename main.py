@@ -3,12 +3,25 @@ from game import Game
 import neat
 import os
 import pickle
+import time
+
+TOTAL_WIDTH = 1280
+TOTAL_HEIGHT = 720
+SCREEN_SIZE = TOTAL_WIDTH, TOTAL_HEIGHT
+
+
+def calculate_distance_reward(distances):
+    reward = 0
+    for distances in distances:
+        width_diffrence = TOTAL_WIDTH-distances
+        reward += width_diffrence/TOTAL_WIDTH
+    return reward
 
 
 def run_game():
     FPS = 60
     clock = pygame.time.Clock()
-    game = Game(allow_keys=True)
+    game = Game(SCREEN_SIZE, allow_keys=True)
 
     while game.running:
         game.event_loop()
@@ -22,7 +35,10 @@ def run_game():
 
 
 def run_ai_game(net: neat.nn.FeedForwardNetwork):
-    game = Game(allow_keys=False)
+    game = Game(SCREEN_SIZE, allow_keys=False)
+    fitness = 0
+    start_time = time.time()
+    MAX_TIME = 4
 
     run = True
     while game.running:
@@ -34,17 +50,23 @@ def run_ai_game(net: neat.nn.FeedForwardNetwork):
         decision = output.index(max(output))
 
         if decision == 0:
-            game.player_ship.shoot_laser()
+            game.ship_shoot_laser()
         if decision == 1:
-            game.player_ship.move_right()
+            game.move_ship_right()
         if decision == 2:
-            game.player_ship.move_left()
+            game.move_ship_left()
         # if 3, then nothing
 
         game.update()
 
+        if start_time + MAX_TIME <= time.time():
+            game.running = False
+
         if not game.running:
-            return game_information.hits
+            fitness += calculate_distance_reward(
+                game_information.shot_distance_from_hits)
+            fitness += game_information.hits
+            return fitness
 
         game.draw(game.screen)
         pygame.display.flip()

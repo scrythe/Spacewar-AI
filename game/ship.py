@@ -30,6 +30,8 @@ class Ship(pygame.sprite.Sprite):
         if self.ammo >= 1:
             self.lasers.add(Laser(self.rect, self.screen_rect))
             self.ammo -= 1
+            return True
+        return False
 
     def inputs(self, keys):
         if keys[pygame.K_d] or keys[pygame.K_RIGHT]:
