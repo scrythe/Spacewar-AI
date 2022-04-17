@@ -37,7 +37,6 @@ class Game:
         self.player_ship: Ship = self.player.sprite
 
         self.enemies = pygame.sprite.Group(Enemy(self.screen_rect))
-        self.enemy: Enemy = self.enemies.sprites()[0]
 
         self.hits = 0
 
@@ -58,9 +57,10 @@ class Game:
 
     def collision(self):
         if pygame.sprite.groupcollide(self.player_ship.lasers, self.enemies, False, False):
-            if pygame.sprite.groupcollide(self.player_ship.lasers, self.enemies, True, False, pygame.sprite.collide_mask):
+            if pygame.sprite.groupcollide(self.player_ship.lasers, self.enemies, True, True, pygame.sprite.collide_mask):
                 self.hits += 1
                 self.player_ship.ammo += 1
+                self.enemies.add(Enemy(self.screen_rect))
 
     def check_lost(self):
         if self.player_ship.ammo == 0 and len(self.player_ship.lasers) == 0:
@@ -77,10 +77,14 @@ class Game:
         self.enemies.draw(screen)
         self.player.draw(screen)
 
+    def get_first_enemy(self):
+        enemy: Enemy = self.enemies.sprites()[0]
+        return enemy
+
     def get_game_information(self):
         ammo = self.player_ship.ammo
         ship_rect = self.player_ship.rect
-        enemy_rect = self.enemy.rect
+        enemy_rect = self.get_first_enemy().rect
         game_info = Game_Information(ammo, ship_rect, enemy_rect)
         return game_info
 
