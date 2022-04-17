@@ -7,4 +7,26 @@ class Ship(pygame.sprite.Sprite):
         super().__init__()
         image = pygame.image.load('assets/spaceship.png').convert_alpha()
         self.image = scale_image(image, 1/4)
-        self.rect = self.image.get_rect(midbottom=screen_rect.midbottom)
+        self.screen_rect = screen_rect
+        self.rect = self.image.get_rect(midbottom=self.screen_rect.midbottom)
+        self.speed = 5
+
+    def move_right(self):
+        self.rect.x += self.speed
+        if self.rect.right >= self.screen_rect.right:
+            self.rect.right = self.screen_rect.right
+
+    def move_left(self):
+        self.rect.x -= self.speed
+        if self.rect.left <= self.screen_rect.left:
+            self.rect.left = self.screen_rect.left
+
+    def inputs(self, keys):
+        if keys[pygame.K_d] or keys[pygame.K_RIGHT]:
+            self.move_right()
+        if keys[pygame.K_a] or keys[pygame.K_LEFT]:
+            self.move_left()
+
+    def update(self):
+        keys = pygame.key.get_pressed()
+        self.inputs(keys)

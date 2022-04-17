@@ -48,7 +48,7 @@ class Game:
                 self.running = False
 
     def update(self):
-        pass
+        self.player.update()
 
     def draw(self, screen: pygame.Surface):
         screen.blit(self.background, self.background_rect)
