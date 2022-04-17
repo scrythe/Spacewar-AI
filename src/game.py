@@ -38,6 +38,8 @@ class Game:
 
         self.enemies = pygame.sprite.Group(Enemy(self.screen_rect))
 
+        self.hits = 0
+
     def run(self):
         while self.running:
             self.event_loop()
@@ -56,11 +58,17 @@ class Game:
     def collision(self):
         if pygame.sprite.groupcollide(self.player_ship.lasers, self.enemies, False, False):
             if pygame.sprite.groupcollide(self.player_ship.lasers, self.enemies, True, False, pygame.sprite.collide_mask):
-                print('yeet')
+                self.hits += 1
+                self.player_ship.ammo += 1
+
+    def check_lost(self):
+        if self.player_ship.ammo == 0 and len(self.player_ship.lasers) == 0:
+            self.running = False
 
     def update(self):
         self.player.update()
         self.collision()
+        self.check_lost()
 
     def draw(self, screen: pygame.Surface):
         screen.blit(self.background, self.background_rect)

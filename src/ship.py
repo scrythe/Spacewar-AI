@@ -13,6 +13,7 @@ class Ship(pygame.sprite.Sprite):
         self.rect = self.image.get_rect(midbottom=self.screen_rect.midbottom)
         self.lasers = pygame.sprite.Group()
         self.speed = 5
+        self.ammo = 2
 
     def move_right(self):
         self.rect.x += self.speed
@@ -25,7 +26,9 @@ class Ship(pygame.sprite.Sprite):
             self.rect.left = self.screen_rect.left
 
     def shoot_laser(self):
-        self.lasers.add(Laser(self.rect, self.screen_rect))
+        if self.ammo >= 1:
+            self.lasers.add(Laser(self.rect, self.screen_rect))
+            self.ammo -= 1
 
     def inputs(self, keys):
         if keys[pygame.K_d] or keys[pygame.K_RIGHT]:
