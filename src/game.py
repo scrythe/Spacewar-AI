@@ -1,5 +1,6 @@
 import pygame
 from ship import Ship
+from enemy import Enemy
 
 
 def fill_background(screen_size):
@@ -35,6 +36,8 @@ class Game:
         self.player = pygame.sprite.GroupSingle(ship)
         self.player_ship: Ship = self.player.sprite
 
+        self.enemies = pygame.sprite.Group(Enemy(self.screen_rect))
+
     def run(self):
         while self.running:
             self.event_loop()
@@ -56,6 +59,7 @@ class Game:
     def draw(self, screen: pygame.Surface):
         screen.blit(self.background, self.background_rect)
         self.player_ship.lasers.draw(screen)
+        self.enemies.draw(screen)
         self.player.draw(screen)
 
 
