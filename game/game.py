@@ -88,12 +88,14 @@ class Game:
         ammo = self.player_ship.ammo
         ship_rect = self.player_ship.rect
         enemy_rect = self.get_first_enemy().rect
-        game_info = Game_Information(ammo, ship_rect, enemy_rect)
+        hits = self.hits
+        game_info = Game_Information(ammo, ship_rect, enemy_rect, hits)
         return game_info
 
 
 class Game_Information:
-    def __init__(self, ammo, ship_rect: pygame.Rect, enemy_rect: pygame.Rect):
+    def __init__(self, ammo, ship_rect: pygame.Rect, enemy_rect: pygame.Rect, hits):
         self.ammo = ammo
         self.ship_x = ship_rect.centerx
         self.enemy_x = enemy_rect.centerx
+        self.hits = hits

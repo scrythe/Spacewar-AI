@@ -24,7 +24,9 @@ def run_game():
 def run_ai_game(net: neat.nn.FeedForwardNetwork):
     game = Game(allow_keys=False)
 
+    run = True
     while game.running:
+        game.event_loop()
         game_information = game.get_game_information()
 
         output = net.activate(
@@ -39,8 +41,11 @@ def run_ai_game(net: neat.nn.FeedForwardNetwork):
             game.player_ship.move_left()
         # if 3, then nothing
 
-        game.event_loop()
         game.update()
+
+        if not game.running:
+            return game_information.hits
+
         game.draw(game.screen)
         pygame.display.flip()
 
@@ -49,7 +54,7 @@ def eval_genomes(genomes, config):
     for genome_id, genome in genomes:
         genome.fitness = 0
         net = neat.nn.FeedForwardNetwork.create(genome, config)
-        run_ai_game(net)
+        genome.fitness = run_ai_game(net)
 
 
 def run_neat(config):
