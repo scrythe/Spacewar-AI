@@ -38,6 +38,7 @@ class Game:
         self.enemies = pygame.sprite.Group(Enemy(self.screen_rect))
 
         self.hits = 0
+        self.amount_shot = 0
         self.shot_distance_from_hits = []
 
     # def run(self):
@@ -63,6 +64,7 @@ class Game:
 
     def ship_shoot_laser(self):
         if self.player_ship.shoot_laser():
+            self.amount_shot += 1
             self.shot_distance_from_hits.append(self.get_distance_from_enemy())
 
     def move_ship_right(self):
@@ -106,15 +108,17 @@ class Game:
         enemy_rect = self.get_first_enemy().rect
         hits = self.hits
         shot_distance_from_hits = self.shot_distance_from_hits
+        amount_shot = self.amount_shot
         game_info = Game_Information(
-            ammo, ship_rect, enemy_rect, hits, shot_distance_from_hits)
+            ammo, ship_rect, enemy_rect, hits, shot_distance_from_hits, amount_shot)
         return game_info
 
 
 class Game_Information:
-    def __init__(self, ammo, ship_rect: pygame.Rect, enemy_rect: pygame.Rect, hits, shot_distance_from_hits):
+    def __init__(self, ammo, ship_rect: pygame.Rect, enemy_rect: pygame.Rect, hits, shot_distance_from_hits, amount_shot):
         self.ammo = ammo
         self.ship_x = ship_rect.centerx
         self.enemy_x = enemy_rect.centerx
         self.hits = hits
         self.shot_distance_from_hits = shot_distance_from_hits
+        self.amount_shot = amount_shot
