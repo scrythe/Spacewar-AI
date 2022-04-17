@@ -7,6 +7,7 @@ class Laser(pygame.sprite.Sprite):
         super().__init__()
         image = pygame.image.load('assets/laser.png').convert_alpha()
         self.image = scale_image(image, 1/2)
+        self.mask = pygame.mask.from_surface(self.image)
         self.screen_rect = screen_rect
         self.rect = self.image.get_rect(midbottom=ship_rect.midtop)
         self.speed = 10

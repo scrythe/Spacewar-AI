@@ -8,6 +8,7 @@ class Ship(pygame.sprite.Sprite):
         super().__init__()
         image = pygame.image.load('assets/spaceship.png').convert_alpha()
         self.image = scale_image(image, 1/4)
+        self.mask = pygame.mask.from_surface(self.image)
         self.screen_rect = screen_rect
         self.rect = self.image.get_rect(midbottom=self.screen_rect.midbottom)
         self.lasers = pygame.sprite.Group()

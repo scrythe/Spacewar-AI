@@ -53,8 +53,14 @@ class Game:
             if event.type == pygame.KEYDOWN and event.key == pygame.K_SPACE:
                 self.player_ship.shoot_laser()
 
+    def collision(self):
+        if pygame.sprite.groupcollide(self.player_ship.lasers, self.enemies, False, False):
+            if pygame.sprite.groupcollide(self.player_ship.lasers, self.enemies, True, False, pygame.sprite.collide_mask):
+                print('yeet')
+
     def update(self):
         self.player.update()
+        self.collision()
 
     def draw(self, screen: pygame.Surface):
         screen.blit(self.background, self.background_rect)
