@@ -24,7 +24,7 @@ class Ship(pygame.sprite.Sprite):
             self.rect.left = self.screen_rect.left
 
     def shoot_laser(self):
-        self.lasers.add(Laser(self.rect))
+        self.lasers.add(Laser(self.rect, self.screen_rect))
 
     def inputs(self, keys):
         if keys[pygame.K_d] or keys[pygame.K_RIGHT]:
@@ -35,3 +35,4 @@ class Ship(pygame.sprite.Sprite):
     def update(self):
         keys = pygame.key.get_pressed()
         self.inputs(keys)
+        self.lasers.update()
