@@ -111,16 +111,18 @@ class Game:
         hits = self.hits
         shot_distance_from_hits = self.shot_distance_from_hits
         amount_shot = self.amount_shot
+        distance_from_enemy = self.get_distance_from_enemy()
         game_info = Game_Information(
-            ammo, ship_rect, enemy_rect, hits, shot_distance_from_hits, amount_shot)
+            ammo, ship_rect, enemy_rect, hits, shot_distance_from_hits, amount_shot, distance_from_enemy)
         return game_info
 
 
 class Game_Information:
-    def __init__(self, ammo, ship_rect: pygame.Rect, enemy_rect: pygame.Rect, hits, shot_distance_from_hits, amount_shot):
+    def __init__(self, ammo, ship_rect: pygame.Rect, enemy_rect: pygame.Rect, hits, shot_distance_from_hits, amount_shot, distance_from_enemy):
         self.ammo = ammo
         self.ship_x = ship_rect.centerx
         self.enemy_x = enemy_rect.centerx
         self.hits = hits
         self.shot_distance_from_hits = shot_distance_from_hits
         self.amount_shot = amount_shot
+        self.distance_from_enemy = distance_from_enemy

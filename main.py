@@ -11,10 +11,15 @@ SCREEN_SIZE = TOTAL_WIDTH, TOTAL_HEIGHT
 
 
 def calculate_distance_reward(distances):
+    width_diffrence = TOTAL_WIDTH-distances
+    reward = width_diffrence/TOTAL_WIDTH
+    return reward
+
+
+def calculate_distance_reward_for_shots(shots):
     reward = 0
-    for distances in distances:
-        width_diffrence = TOTAL_WIDTH-distances
-        reward += width_diffrence/TOTAL_WIDTH
+    for distance in shots:
+        reward += calculate_distance_reward(distance)
     return reward
 
 
@@ -57,10 +62,12 @@ def run_ai_game(net: neat.nn.FeedForwardNetwork):
         game.update()
 
         if not game.running:
-            fitness += calculate_distance_reward(
-                game_information.shot_distance_from_hits)
-            fitness += game_information.hits
+            fitness += calculate_distance_reward_for_shots(
+                game_information.shot_distance_from_hits) / 4
+            fitness += game_information.hits * 2
             fitness += game_information.amount_shot / 2
+            fitness += calculate_distance_reward(
+                game_information.distance_from_enemy)
             return fitness
 
         game.draw(game.screen)
