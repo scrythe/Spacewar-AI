@@ -42,15 +42,15 @@ def run_game():
 
 def calculate_fitness(game_information: Game_Information):
     fitness = 0
-    fitness += calculate_distance_reward_for_shots(
-        game_information.shot_distance_from_hits) / 4
-    fitness += game_information.hits * 2
-    fitness += game_information.amount_shot / 2
-    fitness += calculate_distance_reward(
-        game_information.distance_from_enemy)
+    # fitness += calculate_distance_reward_for_shots(
+    #     game_information.shot_distance_from_hits) / 4
+    # fitness += game_information.hits * 2
+    # fitness += game_information.amount_shot / 2
+    # fitness += calculate_distance_reward(
+    #     game_information.distance_from_enemy)
     fitness += game_information.total_movement_to_player / 10
-    if game_information.total_movement_to_player == 0:
-        fitness -= 1
+    # if game_information.total_movement_to_player == 0:
+    #     fitness -= 1
     return fitness
 
 
@@ -90,7 +90,7 @@ def eval_genomes(genomes, config):
 
 
 def run_neat(config):
-    # population = neat.Checkpointer.restore_checkpoint('neat-checkpoint-92')
+    # population = neat.Checkpointer.restore_checkpoint('neat-checkpoint-4')
     population = neat.Population(config)  # setup population
     population.add_reporter(neat.StdOutReporter(True))
     stats = neat.StatisticsReporter()
@@ -99,7 +99,7 @@ def run_neat(config):
 
     # run population -> evaluate every genome / get fitness of every genome etc
     # let population run 50 generations and return best one to winner
-    winner = population.run(eval_genomes, 50)
+    winner = population.run(eval_genomes, 5)
     with open('best.pickle', 'wb') as f:
         # save best genome in 'best.pickle' file
         pickle.dump(winner, f)
@@ -122,6 +122,6 @@ if __name__ == '__main__':
     config = neat.Config(neat.DefaultGenome, neat.DefaultReproduction,
                          neat.DefaultSpeciesSet, neat.DefaultStagnation, config_path)
 
-    # run_neat(config)
+    run_neat(config)
     # run_game()
-    run_neat_game(config)
+    # run_neat_game(config)

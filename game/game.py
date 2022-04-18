@@ -72,14 +72,14 @@ class Game:
         self.player_ship.move_right()
         if self.player_ship.rect.centerx < self.get_first_enemy().rect.centerx:
             self.movement_to_player += 1
-        self.movement_to_player -= 1.2
+        self.movement_to_player -= 1.005
 
     def move_ship_left(self):
         self.player_ship.move_left()
         if self.player_ship.rect.centerx > self.get_first_enemy().rect.centerx:
             self.movement_to_player += 1
         else:
-            self.movement_to_player -= 1.2
+            self.movement_to_player -= 1.005
 
     def collision(self):
         if pygame.sprite.groupcollide(self.player_ship.lasers, self.enemies, False, False):
