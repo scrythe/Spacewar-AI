@@ -40,6 +40,7 @@ class Game:
         self.hits = 0
         self.amount_shot = 0
         self.shot_distance_from_hits = []
+        self.movement_to_player = 0
 
     # def run(self):
     #     while self.running:
@@ -69,9 +70,16 @@ class Game:
 
     def move_ship_right(self):
         self.player_ship.move_right()
+        if self.player_ship.rect.left < self.get_first_enemy().rect.left:
+            self.movement_to_player += 1
+        self.movement_to_player -= 1.2
 
     def move_ship_left(self):
         self.player_ship.move_left()
+        if self.player_ship.rect.right > self.get_first_enemy().rect.right:
+            self.movement_to_player += 1
+        else:
+            self.movement_to_player -= 1.2
 
     def collision(self):
         if pygame.sprite.groupcollide(self.player_ship.lasers, self.enemies, False, False):
@@ -112,13 +120,14 @@ class Game:
         shot_distance_from_hits = self.shot_distance_from_hits
         amount_shot = self.amount_shot
         distance_from_enemy = self.get_distance_from_enemy()
+        total_movement_to_player = self.movement_to_player
         game_info = Game_Information(
-            ammo, ship_rect, enemy_rect, hits, shot_distance_from_hits, amount_shot, distance_from_enemy)
+            ammo, ship_rect, enemy_rect, hits, shot_distance_from_hits, amount_shot, distance_from_enemy, total_movement_to_player)
         return game_info
 
 
 class Game_Information:
-    def __init__(self, ammo, ship_rect: pygame.Rect, enemy_rect: pygame.Rect, hits, shot_distance_from_hits, amount_shot, distance_from_enemy):
+    def __init__(self, ammo, ship_rect: pygame.Rect, enemy_rect: pygame.Rect, hits, shot_distance_from_hits, amount_shot, distance_from_enemy, total_movement_to_player):
         self.ammo = ammo
         self.ship_x = ship_rect.centerx
         self.enemy_x = enemy_rect.centerx
@@ -126,3 +135,4 @@ class Game_Information:
         self.shot_distance_from_hits = shot_distance_from_hits
         self.amount_shot = amount_shot
         self.distance_from_enemy = distance_from_enemy
+        self.total_movement_to_player = total_movement_to_player

@@ -68,6 +68,7 @@ def run_ai_game(net: neat.nn.FeedForwardNetwork):
             fitness += game_information.amount_shot / 2
             fitness += calculate_distance_reward(
                 game_information.distance_from_enemy)
+            fitness += game_information.total_movement_to_player / 10
             return fitness
 
         game.draw(game.screen)
