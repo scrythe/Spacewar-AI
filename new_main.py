@@ -1,6 +1,8 @@
+import pygame
 from game import AI_Game
 import os
 import neat
+from sys import exit
 
 from main import eval_genomes
 
@@ -11,7 +13,21 @@ SCREEN_SIZE = TOTAL_WIDTH, TOTAL_HEIGHT
 
 
 def eval_genomes(genomes, config):
-    AI_Game(SCREEN_SIZE, genomes, config)
+    ai_game = AI_Game(SCREEN_SIZE, genomes, config)
+
+    while ai_game.running:
+
+        ai_game.run_ais()
+        ai_game.check_lost()
+
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                pygame.quit()
+                exit()
+
+        ai_game.update()
+        ai_game.draw()
+        pygame.display.flip()
 
 
 def run_neat(config):
