@@ -5,8 +5,8 @@ import os
 import pickle
 import time
 
-TOTAL_WIDTH = 1280
-TOTAL_HEIGHT = 720
+TOTAL_WIDTH = 1280/3
+TOTAL_HEIGHT = 720/3
 SCREEN_SIZE = TOTAL_WIDTH, TOTAL_HEIGHT
 
 
@@ -37,10 +37,7 @@ def run_game():
 def run_ai_game(net: neat.nn.FeedForwardNetwork):
     game = Game(SCREEN_SIZE, allow_keys=False)
     fitness = 0
-    start_time = time.time()
-    MAX_TIME = 4
 
-    run = True
     while game.running:
         game.event_loop()
         game_information = game.get_game_information()
@@ -58,9 +55,6 @@ def run_ai_game(net: neat.nn.FeedForwardNetwork):
         # if 3, then nothing
 
         game.update()
-
-        if start_time + MAX_TIME <= time.time():
-            game.running = False
 
         if not game.running:
             fitness += calculate_distance_reward(
@@ -81,7 +75,7 @@ def eval_genomes(genomes, config):
 
 
 def run_neat(config):
-    # population = neat.Checkpointer.restore_checkpoint('')
+    # population = neat.Checkpointer.restore_checkpoint('neat-checkpoint-92')
     population = neat.Population(config)  # setup population
     population.add_reporter(neat.StdOutReporter(True))
     stats = neat.StatisticsReporter()
@@ -104,3 +98,4 @@ if __name__ == '__main__':
                          neat.DefaultSpeciesSet, neat.DefaultStagnation, config_path)
 
     run_neat(config)
+    # run_game()

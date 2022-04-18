@@ -88,6 +88,8 @@ class Game:
         self.player.update()
         self.collision()
         self.check_lost()
+        if self.get_first_enemy().enemy_hit():
+            self.running = False
 
     def draw(self, screen: pygame.Surface):
         screen.blit(self.background, self.background_rect)
