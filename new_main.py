@@ -15,10 +15,11 @@ SCREEN_SIZE = TOTAL_WIDTH, TOTAL_HEIGHT
 def eval_genomes(genomes, config):
     ai_game = AI_Game(SCREEN_SIZE, genomes, config)
 
-    while ai_game.running:
+    run = True
+    while run:
 
         ai_game.run_ais()
-        ai_game.check_lost()
+        run = not ai_game.check_lost()
 
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
@@ -40,7 +41,7 @@ def run_neat(config):
 
     # run population -> evaluate every genome / get fitness of every genome etc
     # let population run 50 generations
-    population.run(eval_genomes, 5)
+    population.run(eval_genomes, 50)
 
 
 if __name__ == '__main__':

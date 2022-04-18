@@ -14,6 +14,8 @@ class AI_Instance:
         self.player_ship: Ship = self.player.sprite
         self.enemies = pygame.sprite.Group(Enemy(self.screen_rect))
         self.hits = 0
+        self.movement_to_player = 0
+        self.shot_distance_from_enemy = []
 
         self.lost = False
 
@@ -30,11 +32,22 @@ class AI_Instance:
         decision = output.index(max(output))
 
         if decision == 0:
-            self.player_ship.shoot_laser()
+            if self.player_ship.shoot_laser():
+                self.shot_distance_from_enemy.append(
+                    self.get_distance_from_enemy())
         if decision == 1:
             self.player_ship.move_right()
+            if self.player_ship.rect.centerx < self.get_first_enemy().rect.centerx:
+                self.movement_to_player += 1
+            else:
+                self.movement_to_player -= 1.005
         if decision == 2:
             self.player_ship.move_left()
+            if self.player_ship.rect.centerx > self.get_first_enemy().rect.centerx:
+                self.movement_to_player += 1
+            else:
+                self.movement_to_player -= 1.005
+
         # if 3, then nothing
 
     def collision(self):
@@ -54,6 +67,23 @@ class AI_Instance:
         self.check_lost()
         if self.get_first_enemy().enemy_hit():
             self.lost = True
+
+    def get_distance_from_enemy(self):
+        distance_diffrence = self.player_ship.rect.centerx - \
+            self.get_first_enemy().rect.centerx
+        return abs(distance_diffrence)
+
+    def calculate_distance_reward_shots(self):
+        reward = 0
+        for shot_distance in self.shot_distance_from_enemy:
+            width_diffrence = self.screen_rect.width - shot_distance
+            reward += width_diffrence / self.screen_rect.width
+        return reward
+
+    def evaluate(self):
+        self.genome.fitness += self.movement_to_player / 100
+        self.genome.fitness += self.calculate_distance_reward_shots()
+        self.genome.fitness += self.hits
 
     def draw(self, screen):
         self.player_ship.lasers.draw(screen)
