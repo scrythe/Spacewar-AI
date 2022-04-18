@@ -1,9 +1,10 @@
 import pygame
-from game import Game
+from game import Game, Game_Information
 import neat
 import os
 import pickle
 import time
+
 
 TOTAL_WIDTH = 1280/3
 TOTAL_HEIGHT = 720/3
@@ -39,9 +40,22 @@ def run_game():
     pygame.quit()
 
 
+def calculate_fitness(game_information: Game_Information):
+    fitness = 0
+    fitness += calculate_distance_reward_for_shots(
+        game_information.shot_distance_from_hits) / 4
+    fitness += game_information.hits * 2
+    fitness += game_information.amount_shot / 2
+    fitness += calculate_distance_reward(
+        game_information.distance_from_enemy)
+    fitness += game_information.total_movement_to_player / 10
+    if game_information.total_movement_to_player == 0:
+        fitness -= 1
+    return fitness
+
+
 def run_ai_game(net: neat.nn.FeedForwardNetwork):
     game = Game(SCREEN_SIZE, allow_keys=False)
-    fitness = 0
 
     while game.running:
         game.event_loop()
@@ -62,14 +76,7 @@ def run_ai_game(net: neat.nn.FeedForwardNetwork):
         game.update()
 
         if not game.running:
-            fitness += calculate_distance_reward_for_shots(
-                game_information.shot_distance_from_hits) / 4
-            fitness += game_information.hits * 2
-            fitness += game_information.amount_shot / 2
-            fitness += calculate_distance_reward(
-                game_information.distance_from_enemy)
-            fitness += game_information.total_movement_to_player / 10
-            return fitness
+            return calculate_fitness(game_information)
 
         game.draw(game.screen)
         pygame.display.flip()
@@ -98,6 +105,16 @@ def run_neat(config):
         pickle.dump(winner, f)
 
 
+def run_neat_game(config):
+    with open("best.pickle", "rb") as f:
+        winner = pickle.load(f)
+    net = neat.nn.FeedForwardNetwork.create(winner, config)
+
+    for i in range(5):
+        fitness = run_ai_game(net)
+        print(fitness)
+
+
 if __name__ == '__main__':
     local_dir = os.path.dirname(__file__)
     config_path = os.path.join(local_dir, 'config.txt')
@@ -105,5 +122,6 @@ if __name__ == '__main__':
     config = neat.Config(neat.DefaultGenome, neat.DefaultReproduction,
                          neat.DefaultSpeciesSet, neat.DefaultStagnation, config_path)
 
-    run_neat(config)
+    # run_neat(config)
     # run_game()
+    run_neat_game(config)

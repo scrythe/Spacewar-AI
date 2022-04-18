@@ -70,13 +70,13 @@ class Game:
 
     def move_ship_right(self):
         self.player_ship.move_right()
-        if self.player_ship.rect.left < self.get_first_enemy().rect.left:
+        if self.player_ship.rect.centerx < self.get_first_enemy().rect.centerx:
             self.movement_to_player += 1
         self.movement_to_player -= 1.2
 
     def move_ship_left(self):
         self.player_ship.move_left()
-        if self.player_ship.rect.right > self.get_first_enemy().rect.right:
+        if self.player_ship.rect.centerx > self.get_first_enemy().rect.centerx:
             self.movement_to_player += 1
         else:
             self.movement_to_player -= 1.2
