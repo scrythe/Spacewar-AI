@@ -1,4 +1,5 @@
 from math import log
+from random import randint
 import neat
 import pygame
 from .ship import Ship
@@ -18,8 +19,15 @@ class AI_Instance:
         self.movement_to_player = 0
         self.movement_away_player = 0
         self.shot_distance_from_enemy = []
+        self.frames = 0
+
+        self.lives = 3
+
+        self.direction_changes = 0
+        self.right = True
 
         self.lost = False
+        self.color = randint(0, 255), randint(0, 255), randint(0, 255)
 
     def get_first_enemy(self):
         enemies: List[Enemy] = self.enemies.sprites()
@@ -43,12 +51,16 @@ class AI_Instance:
                 self.movement_to_player += 1
             else:
                 self.movement_away_player += 1
+            if not self.right:
+                self.direction_changes += 1
         if decision == 2:
             self.player_ship.move_left()
             if self.player_ship.rect.centerx > self.get_first_enemy().rect.centerx:
                 self.movement_to_player += 1
             else:
                 self.movement_away_player += 1
+            if self.right:
+                self.direction_changes += 1
 
         # if 3, then nothing
 
@@ -68,7 +80,12 @@ class AI_Instance:
         self.collision()
         self.check_lost()
         if self.get_first_enemy().enemy_hit():
+            self.lives -= 1
+            self.enemies.empty()
+            self.enemies.add(Enemy(self.screen_rect))
+        if self.lives == 0:
             self.lost = True
+        self.frames += 1
 
     def get_distance_from_enemy(self):
         distance_diffrence = self.player_ship.rect.centerx - \
@@ -82,34 +99,50 @@ class AI_Instance:
             reward += width_diffrence / self.screen_rect.width
         return reward
 
+    def draw_line(self, screen: pygame.Surface):
+        start_pos = self.player_ship.rect.midtop
+        end_pos = self.get_first_enemy().rect.midbottom
+        pygame.draw.line(screen, self.color, start_pos, end_pos)
+
     def evaluate(self):
-        fps_asumption = 420
+        frames = self.frames
 
         # less rewarding the more go
-        movement_to_player = self.movement_to_player / fps_asumption
+        movement_to_player = self.movement_to_player
         log_content = (movement_to_player / 10) + 1 + (9/10)
-        movement_to_reward = 10 * log(log_content, 2)
+        movement_to_reward = (50 * log(log_content, 2) / frames) * 10
         if movement_to_player < 1:
             movement_to_reward = 0
 
         # first good reward for moving, but gets worse the more done
-        movement_away_player = self.movement_away_player / fps_asumption
-        movement_away_reward = 8 * (0.9 ** movement_away_player) - 6
-        if movement_away_player < 1:
-            movement_away_reward = 0
+        movement_away_player = self.movement_away_player
+        movement_away_reward = (movement_away_player / frames) * -5
+
+        # no to much standing still
+        percentage_moved = (movement_to_player + movement_away_player) / frames
+        movement_reward = percentage_moved * 100 - 35  # more than 35% moving
+        if movement_reward > 0:  # only punish if not moving
+            movement_reward = 0
 
         shot_accuracity_reward = self.calculate_distance_reward_shots()
 
         # beginning less rewardsso random shots don't matter, but increases exponential
         hits_reward = 0.5 * (1.5 ** self.hits)
 
+        # shouldn't switch directions often, but direction change less bad if enemy shot
+        direction_changes_reward = (
+            self.direction_changes / (self.hits + 1)) * -0.1
+
         self.genome.fitness += movement_to_reward
         self.genome.fitness += movement_away_reward
+        self.genome.fitness += movement_reward
         self.genome.fitness += shot_accuracity_reward
         self.genome.fitness += hits_reward
+        self.genome.fitness += direction_changes_reward
         self.genome.fitness += 0
 
     def draw(self, screen):
         self.player_ship.lasers.draw(screen)
         self.enemies.draw(screen)
         self.player.draw(screen)
+        self.draw_line(screen)
