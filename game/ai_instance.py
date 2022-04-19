@@ -1,3 +1,4 @@
+from math import log
 import neat
 import pygame
 from .ship import Ship
@@ -15,6 +16,7 @@ class AI_Instance:
         self.enemies = pygame.sprite.Group(Enemy(self.screen_rect))
         self.hits = 0
         self.movement_to_player = 0
+        self.movement_away_player = 0
         self.shot_distance_from_enemy = []
 
         self.lost = False
@@ -40,13 +42,13 @@ class AI_Instance:
             if self.player_ship.rect.centerx < self.get_first_enemy().rect.centerx:
                 self.movement_to_player += 1
             else:
-                self.movement_to_player -= 1.005
+                self.movement_away_player += 1
         if decision == 2:
             self.player_ship.move_left()
             if self.player_ship.rect.centerx > self.get_first_enemy().rect.centerx:
                 self.movement_to_player += 1
             else:
-                self.movement_to_player -= 1.005
+                self.movement_away_player += 1
 
         # if 3, then nothing
 
@@ -81,9 +83,31 @@ class AI_Instance:
         return reward
 
     def evaluate(self):
-        self.genome.fitness += self.movement_to_player / 100
-        self.genome.fitness += self.calculate_distance_reward_shots()
-        self.genome.fitness += self.hits
+        fps_asumption = 420
+
+        # less rewarding the more go
+        movement_to_player = self.movement_to_player / fps_asumption
+        log_content = (movement_to_player / 10) + 1 + (9/10)
+        movement_to_reward = 10 * log(log_content, 2)
+        if movement_to_player < 1:
+            movement_to_reward = 0
+
+        # first good reward for moving, but gets worse the more done
+        movement_away_player = self.movement_away_player / fps_asumption
+        movement_away_reward = 8 * (0.9 ** movement_away_player) - 6
+        if movement_away_player < 1:
+            movement_away_reward = 0
+
+        shot_accuracity_reward = self.calculate_distance_reward_shots()
+
+        # beginning less rewardsso random shots don't matter, but increases exponential
+        hits_reward = 0.5 * (1.5 ** self.hits)
+
+        self.genome.fitness += movement_to_reward
+        self.genome.fitness += movement_away_reward
+        self.genome.fitness += shot_accuracity_reward
+        self.genome.fitness += hits_reward
+        self.genome.fitness += 0
 
     def draw(self, screen):
         self.player_ship.lasers.draw(screen)

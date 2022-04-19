@@ -13,7 +13,7 @@ class Ship(pygame.sprite.Sprite):
         self.rect = self.image.get_rect(midbottom=self.screen_rect.midbottom)
         self.lasers = pygame.sprite.Group()
         self.speed = 5
-        self.ammo = 2
+        self.ammo = 4
 
     def move_right(self):
         self.rect.x += self.speed
