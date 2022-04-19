@@ -5,7 +5,7 @@ import random
 
 
 class Enemy(pygame.sprite.Sprite):
-    MAX_TIME = 3
+    MAX_TIME = 1.5
 
     def __init__(self, screen_rect: pygame.Rect):
         super().__init__()

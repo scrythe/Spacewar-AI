@@ -20,8 +20,10 @@ class AI_Instance:
         self.movement_away_player = 0
         self.shot_distance_from_enemy = []
         self.frames = 0
+        self.near_enemy_counter = 0
+        self.shots = 0
 
-        self.lives = 3
+        self.lives = 8
 
         self.direction_changes = 0
         self.right = True
@@ -45,6 +47,7 @@ class AI_Instance:
             if self.player_ship.shoot_laser():
                 self.shot_distance_from_enemy.append(
                     self.get_distance_from_enemy())
+                self.shots += 1
         if decision == 1:
             self.player_ship.move_right()
             if self.player_ship.rect.centerx < self.get_first_enemy().rect.centerx:
@@ -86,6 +89,13 @@ class AI_Instance:
         if self.lives == 0:
             self.lost = True
         self.frames += 1
+        self.check_if_near_enemy()
+
+    def check_if_near_enemy(self):
+        if self.get_distance_from_enemy() > self.get_first_enemy().rect.width * 1.1:
+            self.near_enemy_counter += 1
+        else:
+            self.near_enemy_counter -= 1
 
     def get_distance_from_enemy(self):
         distance_diffrence = self.player_ship.rect.centerx - \
@@ -118,16 +128,22 @@ class AI_Instance:
         movement_away_player = self.movement_away_player
         movement_away_reward = (movement_away_player / frames) * -5
 
-        # no to much standing still
-        percentage_moved = (movement_to_player + movement_away_player) / frames
-        movement_reward = percentage_moved * 100 - 35  # more than 35% moving
-        if movement_reward > 0:  # only punish if not moving
-            movement_reward = 0
+        # no to much standing still when not near enemy
+        near_enemy_counter_reward = (self.near_enemy_counter / frames) * 2
 
-        shot_accuracity_reward = self.calculate_distance_reward_shots()
+        shot_accuracity_reward = self.calculate_distance_reward_shots() * 2
 
-        # beginning less rewardsso random shots don't matter, but increases exponential
+        enemy_distance = self.get_distance_from_enemy()
+        width_diffrence = self.screen_rect.width - enemy_distance
+        last_point_accuracity_reward = width_diffrence / self.screen_rect.width
+
+        # beginning less reward cause random shots don't matter, but increases exponential
         hits_reward = 0.5 * (1.5 ** self.hits)
+        if self.hits > 1:
+            hits_reward += 3
+
+        # some reward for being able to shoot
+        shots_reward = 2 * self.shots ** 0.1
 
         # shouldn't switch directions often, but direction change less bad if enemy shot
         direction_changes_reward = (
@@ -135,11 +151,13 @@ class AI_Instance:
 
         self.genome.fitness += movement_to_reward
         self.genome.fitness += movement_away_reward
-        self.genome.fitness += movement_reward
+        self.genome.fitness += near_enemy_counter_reward
         self.genome.fitness += shot_accuracity_reward
+        self.genome.fitness += last_point_accuracity_reward
         self.genome.fitness += hits_reward
+        self.genome.fitness += shots_reward
         self.genome.fitness += direction_changes_reward
-        self.genome.fitness += 0
+        self.genome.fitness += 0  # just to set breakpoint
 
     def draw(self, screen):
         self.player_ship.lasers.draw(screen)
