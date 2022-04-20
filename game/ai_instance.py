@@ -120,7 +120,7 @@ class AI_Instance:
 
         # less rewarding the more go
         movement_to_per_s = self.movement_to_player / frames
-        movement_to_reward = 4 * (movement_to_per_s ** 0.4)
+        movement_to_reward = 5 * (movement_to_per_s ** 0.6)
         if self.movement_to_player < 1:
             movement_to_reward = 0
 
@@ -133,27 +133,28 @@ class AI_Instance:
                            movement_away_reward) + movement_away_per_s
 
         # no to much standing still when not near enemy
-        near_enemy_counter_reward = (self.near_enemy_counter / frames) * 2
+        near_enemy_counter_reward = 1.4 * \
+            (self.near_enemy_counter / frames) ** 1.2
+        near_enemy_counter_reward = near_enemy_counter_reward.real  # complex to real
 
         # exponential (look function)
         shot_accuracity_reward = self.calculate_distance_reward_shots()
 
         hits_reward = 4 * (self.hits ** 1.5)
-        miss_shots_reward = 0.4 * (self.shots ** 1.25)
+        miss_shots_reward = 0.6 * (self.shots ** 1.8)
 
         # reward shooters, but too many miss shots are bad
         shots_hits_reward = hits_reward - miss_shots_reward
 
         # shouldn't switch directions often, but direction change less bad if enemy shot
         direction_changes_reward = (
-            self.direction_changes / (self.hits + 1)) * -0.1
+            (self.direction_changes / (self.hits + 1)) ** 1.25 / self.near_enemy_counter) * -0.5
 
-        self.genome.fitness += movement_reward
-        self.genome.fitness += near_enemy_counter_reward
-        self.genome.fitness += shot_accuracity_reward
-        self.genome.fitness += shots_hits_reward
-        self.genome.fitness += direction_changes_reward
-        self.genome.fitness += 0  # just to set breakpoint
+        fitness = 0
+        fitness += movement_reward + near_enemy_counter_reward + shot_accuracity_reward
+        fitness += shots_hits_reward + direction_changes_reward
+
+        self.genome.fitness = fitness
 
     def draw(self, screen):
         self.player_ship.lasers.draw(screen)

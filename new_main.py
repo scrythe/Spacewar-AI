@@ -33,8 +33,8 @@ def eval_genomes(genomes, config):
 
 
 def run_neat(config):
-    # population = neat.Checkpointer.restore_checkpoint('neat-checkpoint-199')
-    population = neat.Population(config)  # setup population
+    population = neat.Checkpointer.restore_checkpoint('neat-checkpoint-57')
+    # population = neat.Population(config)  # setup population
     population.add_reporter(neat.StdOutReporter(True))
     stats = neat.StatisticsReporter()
     population.add_reporter(stats)  # make stats like fitness to be pritten
@@ -42,7 +42,7 @@ def run_neat(config):
 
     # run population -> evaluate every genome / get fitness of every genome etc
     # let population run 50 generations
-    winner = population.run(eval_genomes, 1)
+    winner = population.run(eval_genomes, 200)
     with open('best.pickle', 'wb') as f:
         # save best genome in 'best.pickle' file
         pickle.dump(winner, f)
