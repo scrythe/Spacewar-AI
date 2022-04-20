@@ -106,7 +106,8 @@ class AI_Instance:
         reward = 0
         for shot_distance in self.shot_distance_from_enemy:
             width_diffrence = self.screen_rect.width - shot_distance
-            reward += width_diffrence / self.screen_rect.width
+            # get exponentially worse, the further away the hit is
+            reward += (width_diffrence / self.screen_rect.width) ** 1.2
         return reward
 
     def draw_line(self, screen: pygame.Surface):
@@ -118,44 +119,39 @@ class AI_Instance:
         frames = self.frames
 
         # less rewarding the more go
-        movement_to_player = self.movement_to_player
-        log_content = (movement_to_player / 10) + 1 + (9/10)
-        movement_to_reward = (50 * log(log_content, 2) / frames) * 10
-        if movement_to_player < 1:
+        movement_to_per_s = self.movement_to_player / frames
+        movement_to_reward = 4 * (movement_to_per_s ** 0.4)
+        if self.movement_to_player < 1:
             movement_to_reward = 0
 
-        # first good reward for moving, but gets worse the more done
-        movement_away_player = self.movement_away_player
-        movement_away_reward = (movement_away_player / frames) * -5
+        # first slow but gets more exponential
+        movement_away_per_s = self.movement_away_player / frames
+        movement_away_reward = 0.25 * (movement_away_per_s ** 1.2)
+
+        # reward movers, but prefer those who don't go too much to other direction
+        movement_reward = (movement_to_reward -
+                           movement_away_reward) + movement_away_per_s
 
         # no to much standing still when not near enemy
         near_enemy_counter_reward = (self.near_enemy_counter / frames) * 2
 
-        shot_accuracity_reward = self.calculate_distance_reward_shots() * 2
+        # exponential (look function)
+        shot_accuracity_reward = self.calculate_distance_reward_shots()
 
-        enemy_distance = self.get_distance_from_enemy()
-        width_diffrence = self.screen_rect.width - enemy_distance
-        last_point_accuracity_reward = width_diffrence / self.screen_rect.width
+        hits_reward = 4 * (self.hits ** 1.5)
+        miss_shots_reward = 0.4 * (self.shots ** 1.25)
 
-        # beginning less reward cause random shots don't matter, but increases exponential
-        hits_reward = 0.5 * (1.5 ** self.hits)
-        if self.hits > 1:
-            hits_reward += 3
-
-        # some reward for being able to shoot
-        shots_reward = 2 * self.shots ** 0.1
+        # reward shooters, but too many miss shots are bad
+        shots_hits_reward = hits_reward - miss_shots_reward
 
         # shouldn't switch directions often, but direction change less bad if enemy shot
         direction_changes_reward = (
             self.direction_changes / (self.hits + 1)) * -0.1
 
-        self.genome.fitness += movement_to_reward
-        self.genome.fitness += movement_away_reward
+        self.genome.fitness += movement_reward
         self.genome.fitness += near_enemy_counter_reward
         self.genome.fitness += shot_accuracity_reward
-        self.genome.fitness += last_point_accuracity_reward
-        self.genome.fitness += hits_reward
-        self.genome.fitness += shots_reward
+        self.genome.fitness += shots_hits_reward
         self.genome.fitness += direction_changes_reward
         self.genome.fitness += 0  # just to set breakpoint
 
