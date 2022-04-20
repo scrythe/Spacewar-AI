@@ -33,8 +33,8 @@ def eval_genomes(genomes, config):
 
 
 def run_neat(config):
-    population = neat.Checkpointer.restore_checkpoint('neat-checkpoint-57')
-    # population = neat.Population(config)  # setup population
+    # population = neat.Checkpointer.restore_checkpoint('neat-checkpoint-67')
+    population = neat.Population(config)  # setup population
     population.add_reporter(neat.StdOutReporter(True))
     stats = neat.StatisticsReporter()
     population.add_reporter(stats)  # make stats like fitness to be pritten
