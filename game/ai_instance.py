@@ -36,6 +36,7 @@ class AI_Instance:
 
     def get_current_enemy_x_coords(self):
         index = self.current_enemy_x
+        self.current_enemy_x += 1
         return self.random_x_enemies_array[index]
 
     def get_first_enemy(self):

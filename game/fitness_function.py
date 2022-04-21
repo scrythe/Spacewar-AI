@@ -94,7 +94,7 @@ def test_fitness_function():
 
     # Check for good hit accuracity
     good_hits_tests = []
-    for shots in range(0, 20, 2):
+    for shots in range(0, 200, 2):
         hits = shots * 0.8
         hit_accuracity = get_hit_accuracity_fitness(hits, shots)
         hits_fitness = get_hits_fitness(hits, hit_accuracity)
@@ -111,4 +111,4 @@ def test_fitness_function():
     print('breakpoint')
 
 
-# test_fitness_function()
+test_fitness_function()
