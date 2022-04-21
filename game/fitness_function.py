@@ -17,7 +17,7 @@ def get_shot_accuracity(screen_width, bullet_shots):
     for shot_distance in bullet_shots:
         width_diffrence = screen_width - shot_distance
         # get exponentially worse (= less reward), the further away the hit is
-        fitness += 0.4 * (width_diffrence / screen_width) ** 2
+        fitness += 0.5 * (width_diffrence / screen_width) ** 1.5
     return fitness
 
 
@@ -32,7 +32,7 @@ def get_hit_accuracity_fitness(hits, shots):
 
 def get_hits_fitness(hits, accuracity):
     fitness = hits * accuracity
-    fitness *= 2
+    fitness *= 2.5
     return fitness
 
 

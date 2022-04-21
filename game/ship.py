@@ -1,7 +1,6 @@
 import pygame
 from .utils import scale_image
 from .laser import Laser
-from time import time
 
 
 class Ship(pygame.sprite.Sprite):
@@ -17,8 +16,6 @@ class Ship(pygame.sprite.Sprite):
         self.lasers = pygame.sprite.Group()
         self.speed = 5
         self.ammo = 1
-        self.laser_cooldown = 0.8
-        self.last_shot_laser_time = 0
 
     def move_right(self):
         self.rect.x += self.speed
@@ -31,7 +28,7 @@ class Ship(pygame.sprite.Sprite):
             self.rect.left = self.screen_rect.left
 
     def shoot_laser(self):
-        if self.ammo >= 1 and self.last_shot_laser_time + self.laser_cooldown < time():
+        if self.ammo >= 1:
             self.lasers.add(Laser(self.rect, self.screen_rect))
             self.ammo -= 1
             return True

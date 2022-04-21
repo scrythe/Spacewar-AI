@@ -5,20 +5,21 @@ from .ship import Ship
 from .enemy import Enemy
 from typing import List
 from .fitness_function import fitness_function
-from time import time
 
 
 class AI_Instance:
-    def __init__(self, genome: neat.DefaultGenome, config, screen_rect: pygame.Rect):
+    def __init__(self, genome: neat.DefaultGenome, config, screen_rect: pygame.Rect, random_x_enemies_array, random_x_player):
         self.screen_rect = screen_rect
         self.genome = genome
         self.net = neat.nn.FeedForwardNetwork.create(self.genome, config)
-        random_x = randint(self.screen_rect.left, self.screen_rect.right)
         self.player = pygame.sprite.GroupSingle(
-            Ship(self.screen_rect, random_x))
+            Ship(self.screen_rect, random_x_player))
         self.player_ship: Ship = self.player.sprite
+
+        self.random_x_enemies_array = random_x_enemies_array
+        self.current_enemy_x = 0
         self.enemies = pygame.sprite.Group(
-            Enemy(self.screen_rect, self.player_ship.speed))
+            Enemy(self.screen_rect, self.player_ship.speed, self.get_current_enemy_x_coords()))
         self.movement_to_player = 0
         self.movement_away_player = 0
         self.bullet_shots = []
@@ -32,6 +33,10 @@ class AI_Instance:
 
         self.lost = False
         self.color = randint(0, 255), randint(0, 255), randint(0, 255)
+
+    def get_current_enemy_x_coords(self):
+        index = self.current_enemy_x
+        return self.random_x_enemies_array[index]
 
     def get_first_enemy(self):
         enemies: List[Enemy] = self.enemies.sprites()
@@ -69,7 +74,7 @@ class AI_Instance:
                 self.hits += 1
                 self.player_ship.ammo += 1
                 self.enemies.add(
-                    Enemy(self.screen_rect, self.player_ship.speed))
+                    Enemy(self.screen_rect, self.player_ship.speed, self.get_current_enemy_x_coords()))
 
     def check_lost(self):
         if self.player_ship.ammo == 0 and len(self.player_ship.lasers) == 0:
@@ -82,7 +87,8 @@ class AI_Instance:
         if self.get_first_enemy().enemy_hit():
             self.lives -= 1
             self.enemies.empty()
-            self.enemies.add(Enemy(self.screen_rect, self.player_ship.speed))
+            self.enemies.add(
+                Enemy(self.screen_rect, self.player_ship.speed, self.get_current_enemy_x_coords()))
         if self.lives == 0:
             self.lost = True
         self.frames += 1
