@@ -64,5 +64,5 @@ if __name__ == '__main__':
     config = neat.Config(neat.DefaultGenome, neat.DefaultReproduction,
                          neat.DefaultSpeciesSet, neat.DefaultStagnation, config_path)
 
-    # run_neat(config)
-    run_one_neat(config)
+    run_neat(config)
+    # run_one_neat(config)

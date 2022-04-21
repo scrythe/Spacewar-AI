@@ -15,17 +15,16 @@ class AI_Instance:
         self.net = neat.nn.FeedForwardNetwork.create(self.genome, config)
         self.player = pygame.sprite.GroupSingle(Ship(self.screen_rect))
         self.player_ship: Ship = self.player.sprite
-        self.enemies = pygame.sprite.Group(Enemy(self.screen_rect))
+        self.enemies = pygame.sprite.Group(
+            Enemy(self.screen_rect, self.player_ship.speed))
         self.hits = 0
         self.movement_to_player = 0
         self.movement_away_player = 0
         self.bullet_shots = []
         self.frames = 0
-        self.near_enemy_counter = 0
         self.shots = 0
-        self.start_time = time()
 
-        self.lives = 5
+        self.lives = 1
 
         self.lost = False
         self.color = randint(0, 255), randint(0, 255), randint(0, 255)
@@ -67,7 +66,8 @@ class AI_Instance:
             if pygame.sprite.groupcollide(self.player_ship.lasers, self.enemies, True, True, pygame.sprite.collide_mask):
                 self.hits += 1
                 self.player_ship.ammo += 1
-                self.enemies.add(Enemy(self.screen_rect))
+                self.enemies.add(
+                    Enemy(self.screen_rect, self.player_ship.speed))
 
     def check_lost(self):
         if self.player_ship.ammo == 0 and len(self.player_ship.lasers) == 0:
@@ -80,17 +80,10 @@ class AI_Instance:
         if self.get_first_enemy().enemy_hit():
             self.lives -= 1
             self.enemies.empty()
-            self.enemies.add(Enemy(self.screen_rect))
+            self.enemies.add(Enemy(self.screen_rect, self.player_ship.speed))
         if self.lives == 0:
             self.lost = True
         self.frames += 1
-        self.check_if_near_enemy()
-
-    def check_if_near_enemy(self):
-        if self.get_distance_from_enemy() > self.get_first_enemy().rect.width * 1.1:
-            self.near_enemy_counter += 1
-        else:
-            self.near_enemy_counter -= 1
 
     def get_distance_from_enemy(self):
         distance_diffrence = self.player_ship.rect.centerx - \
@@ -104,8 +97,7 @@ class AI_Instance:
 
     def evaluate(self):
         fitness = fitness_function(
-            self.frames, self.movement_to_player, self.movement_away_player, self.screen_rect.width, self.bullet_shots, self.hits, self.shots, self.start_time)
-
+            self.screen_rect.width, self.bullet_shots, self.hits, self.shots)
         self.genome.fitness = fitness
 
     def draw(self, screen):
