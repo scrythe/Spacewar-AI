@@ -1,4 +1,3 @@
-from math import log
 from random import randint
 import neat
 import pygame
@@ -6,6 +5,7 @@ from .ship import Ship
 from .enemy import Enemy
 from typing import List
 from .fitness_function import fitness_function
+from time import time
 
 
 class AI_Instance:
@@ -23,8 +23,9 @@ class AI_Instance:
         self.frames = 0
         self.near_enemy_counter = 0
         self.shots = 0
+        self.start_time = time()
 
-        self.lives = 8
+        self.lives = 5
 
         self.lost = False
         self.color = randint(0, 255), randint(0, 255), randint(0, 255)
@@ -103,7 +104,7 @@ class AI_Instance:
 
     def evaluate(self):
         fitness = fitness_function(
-            self.frames, self.movement_to_player, self.movement_away_player, self.screen_rect.width, self.bullet_shots, self.hits, self.shots)
+            self.frames, self.movement_to_player, self.movement_away_player, self.screen_rect.width, self.bullet_shots, self.hits, self.shots, self.start_time)
 
         self.genome.fitness = fitness
 

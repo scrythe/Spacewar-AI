@@ -33,7 +33,7 @@ def eval_genomes(genomes, config):
 
 
 def run_neat(config):
-    # population = neat.Checkpointer.restore_checkpoint('neat-checkpoint-67')
+    # population = neat.Checkpointer.restore_checkpoint('neat-checkpoint-38')
     population = neat.Population(config)  # setup population
     population.add_reporter(neat.StdOutReporter(True))
     stats = neat.StatisticsReporter()
@@ -64,5 +64,5 @@ if __name__ == '__main__':
     config = neat.Config(neat.DefaultGenome, neat.DefaultReproduction,
                          neat.DefaultSpeciesSet, neat.DefaultStagnation, config_path)
 
-    run_neat(config)
-    # run_one_neat(config)
+    # run_neat(config)
+    run_one_neat(config)

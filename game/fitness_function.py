@@ -1,3 +1,6 @@
+from time import time
+
+
 def get_movement_fitness(frames, movement_to_player, movement_away_player):
     # less rewarding the more go
     movement_to_per_s = movement_to_player / frames
@@ -24,8 +27,8 @@ def get_shot_accuracity_fitness(screen_width, bullet_shots):
 
 
 def get_shots_hits_fitness(hits, shots):
-    hits_reward = 4 * (hits ** 1.5)
-    miss_shots_reward = 0.6 * (shots ** 1.8)
+    hits_reward = 5 * (hits ** 1.5)
+    miss_shots_reward = 0.6 * (shots ** 1.6)
 
     # reward shooters, but too many miss shots are bad
     fitness = hits_reward - miss_shots_reward
@@ -33,8 +36,13 @@ def get_shots_hits_fitness(hits, shots):
     return fitness
 
 
-def fitness_function(frames, movement_to_player, movement_away_player, screen_width, bullet_shots, hits, shots):
+def get_survived_time_fitness(start_time):
+    time_survived = time() - start_time
+    fitness = time_survived * 0.5
+    return fitness
 
+
+def fitness_function(frames, movement_to_player, movement_away_player, screen_width, bullet_shots, hits, shots, start_time):
     movement_fitness = get_movement_fitness(
         frames, movement_to_player, movement_away_player)
 
@@ -43,10 +51,13 @@ def fitness_function(frames, movement_to_player, movement_away_player, screen_wi
 
     shots_hits_fitness = get_shots_hits_fitness(hits, shots)
 
+    survived_time_fitness = get_survived_time_fitness(start_time)
+
     fitness = 0
     fitness += movement_fitness
     fitness += shot_accuracity_fitness
     fitness += shots_hits_fitness
+    fitness += survived_time_fitness
 
     return fitness
 
@@ -91,19 +102,28 @@ def test_fitness_function():
 
     # Check if good shots
     shots_hits_good_tests = []
-    for shots in range(0, 10):
+    for shots in range(0, 20):
         hits = round(shots*0.8)
         shots_hits_fitness = get_shots_hits_fitness(hits, shots)
         shots_hits_good_tests.append(shots_hits_fitness)
 
     # Check if bad shots
     shots_hits_bad_tests = []
-    for shots in range(0, 10):
+    for shots in range(0, 20):
         hits = round(shots * 0.2)
         shots_hits_fitness = get_shots_hits_fitness(hits, shots)
         shots_hits_bad_tests.append(shots_hits_fitness)
 
-    print(0)
+    # Check if very good shots
+    shots_hits_very_good_tests = []
+    for shots in range(0, 120):
+        hits = round(shots*0.95)
+        shots_hits_fitness = get_shots_hits_fitness(hits, shots)
+        shots_hits_very_good_tests.append(shots_hits_fitness)
+
+    # print(shots_hits_good_tests)
+    print(shots_hits_bad_tests)
+    # print(shots_hits_very_good_tests)
 
 
-test_fitness_function()
+# test_fitness_function()
