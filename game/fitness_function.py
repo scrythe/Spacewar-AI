@@ -6,8 +6,8 @@ def get_movement_fitness(movement_to_player, total_movement, screen_width):
     good_movement_ratio = movement_to_player / total_movement
     # reward ship with better movement
     good_movement_reward_percentage = good_movement_ratio ** 2
-    movement_fitness = movement_to_player_per_screen
-    fitness = movement_fitness * 10
+    movement_fitness = movement_to_player_per_screen * good_movement_reward_percentage
+    fitness = movement_fitness * 8
 
     return fitness
 
@@ -51,8 +51,9 @@ def fitness_function(movement_to_player, total_movement, screen_width, bullet_sh
 
     fitness = 0
     fitness += movement_fitness
-    fitness += shot_accuracity_fitness
-    fitness += hits_fitness
+    # train movement first
+    # fitness += shot_accuracity_fitness
+    # fitness += hits_fitness
 
     return fitness
 
@@ -111,4 +112,4 @@ def test_fitness_function():
     print('breakpoint')
 
 
-test_fitness_function()
+# test_fitness_function()

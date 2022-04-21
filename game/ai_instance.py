@@ -29,7 +29,7 @@ class AI_Instance:
         self.movement_to_player = 0
         self.total_movement = 0
 
-        self.lives = 1
+        self.lives = 4
 
         self.lost = False
         self.color = randint(0, 255), randint(0, 255), randint(0, 255)
