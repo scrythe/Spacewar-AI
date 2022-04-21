@@ -50,6 +50,7 @@ def fitness_function(movement_to_player, total_movement, screen_width, bullet_sh
     hits_fitness = get_hits_fitness(hits, hit_accuracity)
 
     fitness = 0
+    fitness += movement_fitness
     fitness += shot_accuracity_fitness
     fitness += hits_fitness
 
