@@ -13,7 +13,9 @@ class AI_Instance:
         self.screen_rect = screen_rect
         self.genome = genome
         self.net = neat.nn.FeedForwardNetwork.create(self.genome, config)
-        self.player = pygame.sprite.GroupSingle(Ship(self.screen_rect))
+        random_x = randint(self.screen_rect.left, self.screen_rect.right)
+        self.player = pygame.sprite.GroupSingle(
+            Ship(self.screen_rect, random_x))
         self.player_ship: Ship = self.player.sprite
         self.enemies = pygame.sprite.Group(
             Enemy(self.screen_rect, self.player_ship.speed))
@@ -44,10 +46,12 @@ class AI_Instance:
         shoot, move_direction = self.net.activate(inputs)
 
         if shoot > 0:
-            if self.player_ship.shoot_laser():
-                self.bullet_shots.append(
-                    self.get_distance_from_enemy())
-                self.shots += 1
+            # learn moving first
+            pass
+            # if self.player_ship.shoot_laser():
+            #     self.bullet_shots.append(
+            #         self.get_distance_from_enemy())
+            #     self.shots += 1
         if move_direction > 0:
             self.player_ship.move_right()
             if self.player_ship.rect.centerx < self.get_first_enemy().rect.centerx:

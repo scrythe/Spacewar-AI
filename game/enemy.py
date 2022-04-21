@@ -13,7 +13,7 @@ class Enemy(pygame.sprite.Sprite):
         max_right = screen_rect.right-self.image.get_width()
         random_x = random.randint(max_left, max_right)
         self.rect = self.image.get_rect(midtop=(random_x, screen_rect.top))
-        self.max_frames_time = (screen_rect.width / ship_speed) * 1.2
+        self.max_frames_time = (screen_rect.width / ship_speed) * 2
         self.frames = 0
 
     def enemy_hit(self):

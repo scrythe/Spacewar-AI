@@ -7,7 +7,7 @@ def get_movement_fitness(movement_to_player, total_movement, screen_width):
     # reward ship with better movement, reward is exponential
     good_movement_reward_percentage = good_movement_ratio ** 2
     movement_fitness = movement_to_player_per_screen * good_movement_reward_percentage
-    fitness = movement_fitness * 15
+    fitness = movement_fitness * 10
 
     return fitness
 

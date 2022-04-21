@@ -5,16 +5,18 @@ from time import time
 
 
 class Ship(pygame.sprite.Sprite):
-    def __init__(self, screen_rect: pygame.Rect):
+    def __init__(self, screen_rect: pygame.Rect, x):
         super().__init__()
         image = pygame.image.load('assets/spaceship.png').convert_alpha()
         self.image = scale_image(image, 1/4)
         self.mask = pygame.mask.from_surface(self.image)
         self.screen_rect = screen_rect
-        self.rect = self.image.get_rect(midbottom=self.screen_rect.midbottom)
+        self.rect = self.image.get_rect()
+        self.rect.midbottom = self.screen_rect.midbottom
+        self.rect.x = x
         self.lasers = pygame.sprite.Group()
         self.speed = 5
-        self.ammo = 8
+        self.ammo = 1
         self.laser_cooldown = 0.8
         self.last_shot_laser_time = 0
 
