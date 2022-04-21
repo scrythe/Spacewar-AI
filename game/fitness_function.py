@@ -4,9 +4,9 @@ def get_movement_fitness(movement_to_player, total_movement, screen_width):
         total_movement = 1
 
     good_movement_ratio = movement_to_player / total_movement
-    # reward ship with better movement, reward is exponential
+    # reward ship with better movement
     good_movement_reward_percentage = good_movement_ratio ** 2
-    movement_fitness = movement_to_player_per_screen * good_movement_reward_percentage
+    movement_fitness = movement_to_player_per_screen
     fitness = movement_fitness * 10
 
     return fitness
@@ -17,8 +17,8 @@ def get_shot_accuracity(screen_width, bullet_shots):
     for shot_distance in bullet_shots:
         width_diffrence = screen_width - shot_distance
         # get exponentially worse (= less reward), the further away the hit is
-        fitness += 0.5 * (width_diffrence / screen_width) ** 1.5
-    return fitness
+        fitness += 0.8 * (width_diffrence / screen_width) ** 2.5
+    return fitness * 2
 
 
 def get_hit_accuracity_fitness(hits, shots):
@@ -26,13 +26,13 @@ def get_hit_accuracity_fitness(hits, shots):
         shots = 1
     hit_rate = hits / shots
     # reward shooters with better hit rate, reward is exponential
-    accuracity = hit_rate ** 2
+    accuracity = hit_rate ** 1.5
     return accuracity
 
 
 def get_hits_fitness(hits, accuracity):
     fitness = hits * accuracity
-    fitness *= 2.5
+    fitness *= 3
     return fitness
 
 

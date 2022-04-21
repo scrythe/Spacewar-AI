@@ -6,6 +6,7 @@ from sys import exit
 import pickle
 
 from main import eval_genomes
+from time import time
 
 
 TOTAL_WIDTH = 1280
@@ -15,6 +16,8 @@ SCREEN_SIZE = TOTAL_WIDTH, TOTAL_HEIGHT
 
 def eval_genomes(genomes, config):
     ai_game = AI_Game(SCREEN_SIZE, genomes, config)
+    start_time = time()
+    time_display_screen = 0  # when game runs longer than 60 seconds, then display screen
 
     run = True
     while run:
@@ -28,13 +31,15 @@ def eval_genomes(genomes, config):
                 exit()
 
         ai_game.update()
-        ai_game.draw()
-        pygame.display.flip()
+        if time() > start_time + time_display_screen:
+            pass
+            ai_game.draw()
+            pygame.display.flip()
 
 
 def run_neat(config):
-    population = neat.Checkpointer.restore_checkpoint('neat-checkpoint-19')
-    # population = neat.Population(config)  # setup population
+    # population = neat.Checkpointer.restore_checkpoint('neat-checkpoint-199')
+    population = neat.Population(config)  # setup population
     population.add_reporter(neat.StdOutReporter(True))
     stats = neat.StatisticsReporter()
     population.add_reporter(stats)  # make stats like fitness to be pritten
@@ -42,7 +47,7 @@ def run_neat(config):
 
     # run population -> evaluate every genome / get fitness of every genome etc
     # let population run 50 generations
-    winner = population.run(eval_genomes, 50)
+    winner = population.run(eval_genomes, 200)
     with open('best.pickle', 'wb') as f:
         # save best genome in 'best.pickle' file
         pickle.dump(winner, f)
@@ -64,5 +69,5 @@ if __name__ == '__main__':
     config = neat.Config(neat.DefaultGenome, neat.DefaultReproduction,
                          neat.DefaultSpeciesSet, neat.DefaultStagnation, config_path)
 
-    run_neat(config)
-    # run_one_neat(config)
+    # run_neat(config)
+    run_one_neat(config)
