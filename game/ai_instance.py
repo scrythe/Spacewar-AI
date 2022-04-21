@@ -17,12 +17,14 @@ class AI_Instance:
         self.player_ship: Ship = self.player.sprite
         self.enemies = pygame.sprite.Group(
             Enemy(self.screen_rect, self.player_ship.speed))
-        self.hits = 0
         self.movement_to_player = 0
         self.movement_away_player = 0
         self.bullet_shots = []
         self.frames = 0
+        self.hits = 0
         self.shots = 0
+        self.movement_to_player = 0
+        self.total_movement = 0
 
         self.lives = 1
 
@@ -49,15 +51,13 @@ class AI_Instance:
         if move_direction > 0:
             self.player_ship.move_right()
             if self.player_ship.rect.centerx < self.get_first_enemy().rect.centerx:
-                self.movement_to_player += 1
-            else:
-                self.movement_away_player += 1
+                self.movement_to_player += self.player_ship.speed
+            self.total_movement += self.player_ship.speed
         else:
             self.player_ship.move_left()
             if self.player_ship.rect.centerx > self.get_first_enemy().rect.centerx:
-                self.movement_to_player += 1
-            else:
-                self.movement_away_player += 1
+                self.movement_to_player += self.player_ship.speed
+            self.total_movement += self.player_ship.speed
 
         # if 3, then nothing
 
@@ -96,8 +96,8 @@ class AI_Instance:
         pygame.draw.line(screen, self.color, start_pos, end_pos)
 
     def evaluate(self):
-        fitness = fitness_function(
-            self.screen_rect.width, self.bullet_shots, self.hits, self.shots)
+        fitness = fitness_function(self.movement_to_player, self.total_movement,
+                                   self.screen_rect.width, self.bullet_shots, self.hits, self.shots)
         self.genome.fitness = fitness
 
     def draw(self, screen):

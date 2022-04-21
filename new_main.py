@@ -42,7 +42,7 @@ def run_neat(config):
 
     # run population -> evaluate every genome / get fitness of every genome etc
     # let population run 50 generations
-    winner = population.run(eval_genomes, 200)
+    winner = population.run(eval_genomes, 500)
     with open('best.pickle', 'wb') as f:
         # save best genome in 'best.pickle' file
         pickle.dump(winner, f)

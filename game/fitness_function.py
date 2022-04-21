@@ -1,3 +1,17 @@
+def get_movement_fitness(movement_to_player, total_movement, screen_width):
+    movement_to_player_per_screen = movement_to_player / screen_width
+    if total_movement < 1:
+        total_movement = 1
+
+    good_movement_ratio = movement_to_player / total_movement
+    # reward ship with better movement, reward is exponential
+    good_movement_reward_percentage = good_movement_ratio ** 2
+    movement_fitness = movement_to_player_per_screen * good_movement_reward_percentage
+    fitness = movement_fitness * 15
+
+    return fitness
+
+
 def get_shot_accuracity(screen_width, bullet_shots):
     fitness = 0
     for shot_distance in bullet_shots:
@@ -12,8 +26,8 @@ def get_hit_accuracity_fitness(hits, shots):
         shots = 1
     hit_rate = hits / shots
     # reward shooters with better hit rate, reward is exponential
-    fitness = hit_rate ** 2
-    return fitness
+    accuracity = hit_rate ** 2
+    return accuracity
 
 
 def get_hits_fitness(hits, accuracity):
@@ -22,7 +36,10 @@ def get_hits_fitness(hits, accuracity):
     return fitness
 
 
-def fitness_function(screen_width, bullet_shots, hits, shots):
+def fitness_function(movement_to_player, total_movement, screen_width, bullet_shots, hits, shots):
+
+    movement_fitness = get_movement_fitness(
+        movement_to_player, total_movement, screen_width)
 
     shot_accuracity_fitness = get_shot_accuracity(
         screen_width, bullet_shots)
@@ -40,6 +57,24 @@ def fitness_function(screen_width, bullet_shots, hits, shots):
 
 
 def test_fitness_function():
+    # Check if good movement
+    movement_good_tests = []
+    for movement in range(100, 1280, 50):
+        screen_width = 1280
+        movement_to_player = movement * 0.8
+        movement_fitness = get_movement_fitness(
+            movement_to_player, movement, screen_width)
+        movement_good_tests.append(movement_fitness)
+
+    # Check if bad movement
+    movement_bad_tests = []
+    for movement in range(1280, 12800, 1280):
+        screen_width = 1280
+        movement_to_player = movement * 0.2
+        movement_fitness = get_movement_fitness(
+            movement_to_player, movement, screen_width)
+        movement_bad_tests.append(movement_fitness)
+
     # Check for shot accuracity, on how close hit was
     shot_accuracity_tests = []
     for shot_accuracity in range(0, 1280, 50):
