@@ -27,8 +27,9 @@ def eval_genomes(genomes, config):
 
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
-                pygame.quit()
-                exit()
+                pass
+                # pygame.quit()
+                # exit()
 
         ai_game.update()
         if time() > start_time + time_display_screen:
@@ -38,8 +39,8 @@ def eval_genomes(genomes, config):
 
 
 def run_neat(config):
-    # population = neat.Checkpointer.restore_checkpoint('neat-checkpoint-199')
-    population = neat.Population(config)  # setup population
+    population = neat.Checkpointer.restore_checkpoint('neat-checkpoint-998')
+    # population = neat.Population(config)  # setup population
     population.add_reporter(neat.StdOutReporter(True))
     stats = neat.StatisticsReporter()
     population.add_reporter(stats)  # make stats like fitness to be pritten
@@ -47,7 +48,7 @@ def run_neat(config):
 
     # run population -> evaluate every genome / get fitness of every genome etc
     # let population run 50 generations
-    winner = population.run(eval_genomes, 100)
+    winner = population.run(eval_genomes, 3000)
     with open('best.pickle', 'wb') as f:
         # save best genome in 'best.pickle' file
         pickle.dump(winner, f)
