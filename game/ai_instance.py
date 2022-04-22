@@ -29,7 +29,7 @@ class AI_Instance:
         self.movement_to_player = 0
         self.total_movement = 0
 
-        self.lives = 4
+        self.lives = 1
 
         self.lost = False
         self.color = randint(0, 255), randint(0, 255), randint(0, 255)
@@ -52,7 +52,7 @@ class AI_Instance:
         shoot, move_direction = self.net.activate(inputs)
 
         if shoot > 0:
-            if self.player_ship.shoot_laser():
+            if self.player_ship.shoot_laser(self.frames):
                 self.bullet_shots.append(
                     self.get_distance_from_enemy())
                 self.shots += 1
@@ -106,7 +106,7 @@ class AI_Instance:
 
     def evaluate(self):
         fitness = fitness_function(self.movement_to_player, self.total_movement,
-                                   self.screen_rect.width, self.bullet_shots, self.hits, self.shots)
+                                   self.screen_rect.width, self.bullet_shots, self.hits, self.shots, self.frames)
         self.genome.fitness = fitness
 
     def draw(self, screen):

@@ -4,6 +4,9 @@ from .laser import Laser
 
 
 class Ship(pygame.sprite.Sprite):
+    MAX_AMMO = 2
+    SHOT_DELAY = 300
+
     def __init__(self, screen_rect: pygame.Rect, x):
         super().__init__()
         image = pygame.image.load('assets/spaceship.png').convert_alpha()
@@ -15,7 +18,8 @@ class Ship(pygame.sprite.Sprite):
         self.rect.x = x
         self.lasers = pygame.sprite.Group()
         self.speed = 5
-        self.ammo = 1
+        self.ammo = self.MAX_AMMO
+        self.last_shot = 0
 
     def move_right(self):
         self.rect.x += self.speed
@@ -27,8 +31,9 @@ class Ship(pygame.sprite.Sprite):
         if self.rect.left <= self.screen_rect.left:
             self.rect.left = self.screen_rect.left
 
-    def shoot_laser(self):
-        if self.ammo >= 1:
+    def shoot_laser(self, frames):
+        if self.ammo >= 1 and self.last_shot + self.SHOT_DELAY < frames:
+            self.last_shot = frames
             self.lasers.add(Laser(self.rect, self.screen_rect))
             self.ammo -= 1
             return True

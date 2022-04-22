@@ -17,7 +17,7 @@ SCREEN_SIZE = TOTAL_WIDTH, TOTAL_HEIGHT
 def eval_genomes(genomes, config):
     ai_game = AI_Game(SCREEN_SIZE, genomes, config)
     start_time = time()
-    time_display_screen = 60  # when game runs longer than 60 seconds, then display screen
+    time_display_screen = 0  # when game runs longer than 60 seconds, then display screen
 
     run = True
     while run:
@@ -39,7 +39,7 @@ def eval_genomes(genomes, config):
 
 
 def run_neat(config):
-    population = neat.Checkpointer.restore_checkpoint('neat-checkpoint-998')
+    population = neat.Checkpointer.restore_checkpoint('neat-checkpoint-8')
     # population = neat.Population(config)  # setup population
     population.add_reporter(neat.StdOutReporter(True))
     stats = neat.StatisticsReporter()
@@ -48,7 +48,7 @@ def run_neat(config):
 
     # run population -> evaluate every genome / get fitness of every genome etc
     # let population run 50 generations
-    winner = population.run(eval_genomes, 3000)
+    winner = population.run(eval_genomes, 1000)
     with open('best.pickle', 'wb') as f:
         # save best genome in 'best.pickle' file
         pickle.dump(winner, f)
@@ -57,7 +57,7 @@ def run_neat(config):
 def run_one_neat(config):
     with open("best.pickle", "rb") as f:
         winner = pickle.load(f)
-    genomes = [(0, winner), (1, winner), (2, winner)]
+    genomes = [(0, winner)]
     eval_genomes(genomes, config)
     for genome_id, genome in genomes:
         print(genome.fitness)
@@ -70,5 +70,5 @@ if __name__ == '__main__':
     config = neat.Config(neat.DefaultGenome, neat.DefaultReproduction,
                          neat.DefaultSpeciesSet, neat.DefaultStagnation, config_path)
 
-    run_neat(config)
-    # run_one_neat(config)
+    # run_neat(config)
+    run_one_neat(config)

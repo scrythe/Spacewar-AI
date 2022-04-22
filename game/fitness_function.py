@@ -36,7 +36,25 @@ def get_hits_fitness(hits, accuracity):
     return fitness
 
 
-def fitness_function(movement_to_player, total_movement, screen_width, bullet_shots, hits, shots):
+def move_wrong_way(movement_away_player, screen_width):
+    movement_away_player_per_screen = movement_away_player / screen_width
+    if total_movement < 1:
+        total_movement = 1
+
+    good_movement_ratio = movement_away_player / total_movement
+    # negative reward for going in wrong way
+    movement_fitness = movement_away_player_per_screen
+    fitness = movement_fitness * 8
+
+    return fitness
+
+
+def get_survive_time_fitness(frames):
+    fitness = frames / 200
+    return fitness
+
+
+def fitness_function(movement_to_player, total_movement, screen_width, bullet_shots, hits, shots, frames):
 
     movement_fitness = get_movement_fitness(
         movement_to_player, total_movement, screen_width)
@@ -49,11 +67,13 @@ def fitness_function(movement_to_player, total_movement, screen_width, bullet_sh
 
     hits_fitness = get_hits_fitness(hits, hit_accuracity)
 
+    frames_fitness = get_survive_time_fitness(frames)
+
     fitness = 0
-    # train only shot and hit accuracity now, and bit movement
-    fitness += movement_fitness * 0.5
+    fitness += movement_fitness * 0.05
     fitness += shot_accuracity_fitness
     fitness += hits_fitness
+    fitness += frames_fitness
 
     return fitness
 
@@ -108,6 +128,12 @@ def test_fitness_function():
         hit_accuracity = get_hit_accuracity_fitness(hits, shots)
         hits_fitness = get_hits_fitness(hits, hit_accuracity)
         bad_hits_tests.append(hits_fitness)
+
+    # Check how long survived
+    frames_survived_tests = []
+    for frames in range(20, 800, 50):
+        survived_time_fitness = get_survive_time_fitness(frames)
+        frames_survived_tests.append(survived_time_fitness)
 
     print('breakpoint')
 
