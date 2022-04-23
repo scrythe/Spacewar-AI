@@ -1,118 +1,65 @@
 import pygame
-from game import Game, Game_Information
-import neat
+from game import AI_Game
 import os
+import neat
+from sys import exit
 import pickle
-import time
+
+from time import time
 
 
-TOTAL_WIDTH = 1280/3
-TOTAL_HEIGHT = 720/3
+TOTAL_WIDTH = 1280
+TOTAL_HEIGHT = 720
 SCREEN_SIZE = TOTAL_WIDTH, TOTAL_HEIGHT
 
 
-def calculate_distance_reward(distances):
-    width_diffrence = TOTAL_WIDTH-distances
-    reward = width_diffrence/TOTAL_WIDTH
-    return reward
-
-
-def calculate_distance_reward_for_shots(shots):
-    reward = 0
-    for distance in shots:
-        reward += calculate_distance_reward(distance)
-    return reward
-
-
-def run_game():
-    FPS = 60
-    clock = pygame.time.Clock()
-    game = Game(SCREEN_SIZE, allow_keys=True)
-
-    while game.running:
-        game.event_loop()
-        game.update()
-        game.draw(game.screen)
-        game_information = game.get_game_information()
-        pygame.display.flip()
-        clock.tick(FPS)
-
-    pygame.quit()
-
-
-def calculate_fitness(game_information: Game_Information):
-    fitness = 0
-    # fitness += calculate_distance_reward_for_shots(
-    #     game_information.shot_distance_from_hits) / 4
-    # fitness += game_information.hits * 2
-    # fitness += game_information.amount_shot / 2
-    # fitness += calculate_distance_reward(
-    #     game_information.distance_from_enemy)
-    fitness += game_information.total_movement_to_player / 10
-    # if game_information.total_movement_to_player == 0:
-    #     fitness -= 1
-    return fitness
-
-
-def run_ai_game(net: neat.nn.FeedForwardNetwork):
-    game = Game(SCREEN_SIZE, allow_keys=False)
-
-    while game.running:
-        game.event_loop()
-        game_information = game.get_game_information()
-
-        output = net.activate(
-            (game_information.ammo, game_information.ship_x, game_information.enemy_x))
-        decision = output.index(max(output))
-
-        if decision == 0:
-            game.ship_shoot_laser()
-        if decision == 1:
-            game.move_ship_right()
-        if decision == 2:
-            game.move_ship_left()
-        # if 3, then nothing
-
-        game.update()
-
-        if not game.running:
-            return calculate_fitness(game_information)
-
-        game.draw(game.screen)
-        pygame.display.flip()
-
-
 def eval_genomes(genomes, config):
-    for genome_id, genome in genomes:
-        genome.fitness = 0
-        net = neat.nn.FeedForwardNetwork.create(genome, config)
-        genome.fitness = run_ai_game(net)
+    ai_game = AI_Game(SCREEN_SIZE, genomes, config)
+    start_time = time()
+    time_display_screen = 0  # when game runs longer than 60 seconds, then display screen
+
+    run = True
+    while run:
+
+        ai_game.run_ais()
+        run = not ai_game.check_lost()
+
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                pass
+                # pygame.quit()
+                # exit()
+
+        ai_game.update()
+        if time() > start_time + time_display_screen:
+            pass
+            ai_game.draw()
+            pygame.display.flip()
 
 
 def run_neat(config):
-    # population = neat.Checkpointer.restore_checkpoint('neat-checkpoint-4')
-    population = neat.Population(config)  # setup population
+    population = neat.Checkpointer.restore_checkpoint('neat-checkpoint-8')
+    # population = neat.Population(config)  # setup population
     population.add_reporter(neat.StdOutReporter(True))
     stats = neat.StatisticsReporter()
     population.add_reporter(stats)  # make stats like fitness to be pritten
     population.add_reporter(neat.Checkpointer(1))  # checkpoint every gen
 
     # run population -> evaluate every genome / get fitness of every genome etc
-    # let population run 50 generations and return best one to winner
-    winner = population.run(eval_genomes, 5)
+    # let population run 50 generations
+    winner = population.run(eval_genomes, 1000)
     with open('best.pickle', 'wb') as f:
         # save best genome in 'best.pickle' file
         pickle.dump(winner, f)
 
 
-def run_neat_game(config):
+def run_one_neat(config):
     with open("best.pickle", "rb") as f:
         winner = pickle.load(f)
-    net = neat.nn.FeedForwardNetwork.create(winner, config)
-
-    for i in range(5):
-        fitness = run_ai_game(net)
-        print(fitness)
+    genomes = [(0, winner)]
+    eval_genomes(genomes, config)
+    for genome_id, genome in genomes:
+        print(genome.fitness)
 
 
 if __name__ == '__main__':
@@ -122,6 +69,5 @@ if __name__ == '__main__':
     config = neat.Config(neat.DefaultGenome, neat.DefaultReproduction,
                          neat.DefaultSpeciesSet, neat.DefaultStagnation, config_path)
 
-    run_neat(config)
-    # run_game()
-    # run_neat_game(config)
+    # run_neat(config)
+    run_one_neat(config)
