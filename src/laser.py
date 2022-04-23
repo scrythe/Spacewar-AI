@@ -11,13 +11,14 @@ class Laser(pygame.sprite.Sprite):
         self.screen_rect = screen_rect
         self.rect = self.image.get_rect(midbottom=ship_rect.midtop)
         self.speed = 10
+        self.dead = False
 
     def move_top(self):
         self.rect.y -= self.speed
 
     def check_top(self):
         if self.rect.bottom <= self.screen_rect.top:
-            self.kill()
+            self.dead = True
 
     def update(self):
         self.move_top()

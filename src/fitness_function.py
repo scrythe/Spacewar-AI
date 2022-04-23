@@ -36,19 +36,6 @@ def get_hits_fitness(hits, accuracity):
     return fitness
 
 
-def move_wrong_way(movement_away_player, screen_width):
-    movement_away_player_per_screen = movement_away_player / screen_width
-    if total_movement < 1:
-        total_movement = 1
-
-    good_movement_ratio = movement_away_player / total_movement
-    # negative reward for going in wrong way
-    movement_fitness = movement_away_player_per_screen
-    fitness = movement_fitness * 8
-
-    return fitness
-
-
 def get_survive_time_fitness(frames):
     fitness = frames / 200
     return fitness

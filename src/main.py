@@ -34,14 +34,14 @@ def eval_genomes(genomes, config):
 
 
 def run_neat_population(config):
-    # population = neat.Population(config)
-    population = neat.Checkpointer.restore_checkpoint('neat-checkpoint-499')
+    population = neat.Population(config)
+    # population = neat.Checkpointer.restore_checkpoint('neat-checkpoint-499')
     population.add_reporter(neat.StdOutReporter(True))
     stats = neat.StatisticsReporter()
     population.add_reporter(stats)
     population.add_reporter(neat.Checkpointer(1))
 
-    best_genome = population.run(eval_genomes, 500)
+    best_genome = population.run(eval_genomes, 2000)
     with open('best.pickle', 'wb') as f:
         # save best genome in 'best.pickle' file
         pickle.dump(best_genome, f)

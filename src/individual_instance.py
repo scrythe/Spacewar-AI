@@ -6,6 +6,7 @@ from random import randint
 from enemy import Enemy
 from typing import List
 from fitness_function import fitness_function
+from laser import Laser
 
 
 def make_create_random_x_coord_func(screen_rect: pygame.Surface):
@@ -20,7 +21,7 @@ def make_create_random_x_coord_func(screen_rect: pygame.Surface):
 
 
 class Individual_Instance:
-    MAX_LIVES = 2
+    MAX_LIVES = 1
 
     def __init__(self, genome: neat.DefaultGenome, config, screen_rect: pygame.Rect, first_10_x_pos):
         self.genome = genome
@@ -60,18 +61,16 @@ class Individual_Instance:
         ammo = self.player_ship.ammo
         player_x = self.player_ship.rect.centerx
         enemy_x = self.get_first_enemy().rect.centerx
-        laser_amount = len(self.player_ship.lasers)
         enemy_speed = self.get_first_enemy().speed
         enemy_last_changed_direction_time = self.frames - \
             self.get_first_enemy().last_change_direction
 
-        inputs = ammo, player_x, enemy_x, laser_amount, enemy_speed, enemy_last_changed_direction_time
+        inputs = ammo, player_x, enemy_x, enemy_speed, enemy_last_changed_direction_time
         shoot, move_direction = self.net.activate(inputs)
 
         if shoot > 0:
             if self.player_ship.shoot_laser(self.frames):
                 self.shots += 1
-                self.bullet_shots.append(self.get_distance_from_enemy())
         if move_direction > 0:
             self.player_ship.move_right()
             self.total_movement += self.player_ship.SPEED
@@ -84,10 +83,17 @@ class Individual_Instance:
             if 0 > self.check_move_to_enemy():
                 self.movement_to_player += self.player_ship.SPEED
 
-    def get_distance_from_enemy(self):
-        player_x = self.player_ship.rect.centerx
+    def check_laser_gone(self):
+        laser_sprites: List[Laser] = self.player_ship.lasers.sprites()
+        for laser in laser_sprites:
+            if laser.dead:
+                self.bullet_shots.append(self.get_distance_from_enemy(laser))
+                laser.kill()
+
+    def get_distance_from_enemy(self, laser: Laser):
+        laser_x = laser.rect.centerx
         enemy_x = self.get_first_enemy().rect.centerx
-        x_diffrence = player_x - enemy_x
+        x_diffrence = laser_x - enemy_x
         return abs(x_diffrence)
 
     def add_enemy(self):
@@ -103,7 +109,7 @@ class Individual_Instance:
             self.player_ship.lasers, self.enemies, True, True, pygame.sprite.collide_mask)
         if check_collision:
             self.hits += 1
-            self.player_ship.ammo += 1.5
+            self.player_ship.ammo += 1
             self.add_enemy()
 
     def check_lost(self):
@@ -128,6 +134,7 @@ class Individual_Instance:
         self.player.update()
         self.collision()
         self.enemies.update(self.frames)
+        self.check_laser_gone()
         if self.get_first_enemy().enemy_hitted:
             self.reduce_live()
         self.check_lost()
