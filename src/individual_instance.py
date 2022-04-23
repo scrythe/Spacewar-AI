@@ -61,8 +61,11 @@ class Individual_Instance:
         player_x = self.player_ship.rect.centerx
         enemy_x = self.get_first_enemy().rect.centerx
         laser_amount = len(self.player_ship.lasers)
+        enemy_speed = self.get_first_enemy().speed
+        enemy_last_changed_direction_time = self.frames - \
+            self.get_first_enemy().last_change_direction
 
-        inputs = ammo, player_x, enemy_x, laser_amount
+        inputs = ammo, player_x, enemy_x, laser_amount, enemy_speed, enemy_last_changed_direction_time
         shoot, move_direction = self.net.activate(inputs)
 
         if shoot > 0:
@@ -100,7 +103,7 @@ class Individual_Instance:
             self.player_ship.lasers, self.enemies, True, True, pygame.sprite.collide_mask)
         if check_collision:
             self.hits += 1
-            self.player_ship.ammo += 1
+            self.player_ship.ammo += 1.5
             self.add_enemy()
 
     def check_lost(self):
@@ -124,7 +127,8 @@ class Individual_Instance:
         self.frames += 1
         self.player.update()
         self.collision()
-        if self.get_first_enemy().enemy_hit(self.frames):
+        self.enemies.update(self.frames)
+        if self.get_first_enemy().enemy_hitted:
             self.reduce_live()
         self.check_lost()
 

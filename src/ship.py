@@ -11,7 +11,7 @@ def create_rect(image: pygame.Surface, screen_rect: pygame.Rect):
 
 class Ship(pygame.sprite.Sprite):
     SPEED = 5
-    MAX_AMMO = 2
+    MAX_AMMO = 8
     SHOT_DELAY = 250
 
     def __init__(self, screen_rect: pygame.Rect, x):
