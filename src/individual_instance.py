@@ -9,7 +9,7 @@ from fitness_function import fitness_function
 
 
 def make_create_random_x_coord_func(screen_rect: pygame.Surface):
-    enemy_structur = Enemy(0, pygame.Rect(0, 0, 0, 0), 1)
+    enemy_structur = Enemy(0, pygame.Rect(0, 0, 0, 0), 1, 0)
     max_left = enemy_structur.image.get_width()
     max_right = screen_rect.right-enemy_structur.image.get_width()
 
@@ -22,10 +22,12 @@ def make_create_random_x_coord_func(screen_rect: pygame.Surface):
 class Individual_Instance:
     MAX_LIVES = 2
 
-    def __init__(self, genome: neat.DefaultGenome, config, screen_rect: pygame.Rect):
+    def __init__(self, genome: neat.DefaultGenome, config, screen_rect: pygame.Rect, first_10_x_pos):
         self.genome = genome
         self.net = neat.nn.FeedForwardNetwork.create(self.genome, config)
         self.screen_rect = screen_rect
+        self.array_of_x_coords = first_10_x_pos
+        self.array_x_coords_index = 0
         self.create_random_x_coord = make_create_random_x_coord_func(
             self.screen_rect)
         self.player = pygame.sprite.GroupSingle(
@@ -33,13 +35,13 @@ class Individual_Instance:
         self.player_ship: Ship = self.player.sprite
 
         self.x_coord = randint(self.screen_rect.left, self.screen_rect.right)
+        self.frames = 0
         self.enemies = pygame.sprite.Group()
         self.add_enemy()
 
         self.movement_to_player = 0
         self.total_movement = 0
         self.bullet_shots = []
-        self.frames = 0
         self.hits = 0
         self.shots = 0
 
@@ -86,13 +88,16 @@ class Individual_Instance:
         return abs(x_diffrence)
 
     def add_enemy(self):
-        new_enemy = Enemy(self.create_random_x_coord(),
-                          self.screen_rect, self.player_ship.SPEED)
+        x_coord = self.array_of_x_coords[self.array_x_coords_index]
+        self.array_x_coords_index += 1
+        self.array_of_x_coords.append(self.create_random_x_coord())
+        new_enemy = Enemy(x_coord, self.screen_rect,
+                          self.player_ship.SPEED, self.frames)
         self.enemies.add(new_enemy)
 
     def collision(self):
         check_collision = pygame.sprite.groupcollide(
-            self.player_ship.lasers, self.enemies, False, False, pygame.sprite.collide_mask)
+            self.player_ship.lasers, self.enemies, True, True, pygame.sprite.collide_mask)
         if check_collision:
             self.hits += 1
             self.player_ship.ammo += 1

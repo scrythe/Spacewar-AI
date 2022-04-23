@@ -20,11 +20,15 @@ def fill_background(screen_size):
 
 
 def create_and_game_population(genomes, config, screen_rect):
+    first_10_pos = [800, 400, 700, 300, 900, 500, 200, 400, 900, 1000]
+
     ai_game_population: List[Individual_Instance] = []
     for genome_id, genome in genomes:
         genome: neat.DefaultGenome
-        individual_instance = Individual_Instance(genome, config, screen_rect)
+        individual_instance = Individual_Instance(
+            genome, config, screen_rect, first_10_pos)
         ai_game_population.append(individual_instance)
+
     return ai_game_population
 
 

@@ -11,7 +11,6 @@ SCREEN_SIZE = TOTAL_WIDTH, TOTAL_HEIGHT
 
 def draw(start_time, time_display_screen, game: Population_Game):
     if time() > start_time + time_display_screen:
-        pass
         game.draw()
         pygame.display.flip()
 
@@ -19,7 +18,7 @@ def draw(start_time, time_display_screen, game: Population_Game):
 def eval_genomes(genomes, config):
     game = Population_Game(genomes, config, SCREEN_SIZE)
     start_time = time()
-    start_show_screen_time_after = 0
+    start_show_screen_time_after = 60
 
     run = True
     while run:
