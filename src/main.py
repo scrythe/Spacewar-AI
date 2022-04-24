@@ -29,13 +29,12 @@ def eval_genomes(genomes, config):
         run = not game.check_game_end()
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
-                pygame.quit()
-                exit()
+                run = False
 
 
 def run_neat_population(config):
-    population = neat.Population(config)
-    # population = neat.Checkpointer.restore_checkpoint('neat-checkpoint-499')
+    # population = neat.Population(config)
+    population = neat.Checkpointer.restore_checkpoint('neat-checkpoint-1461')
     population.add_reporter(neat.StdOutReporter(True))
     stats = neat.StatisticsReporter()
     population.add_reporter(stats)

@@ -129,6 +129,10 @@ class Individual_Instance:
         self.enemies.empty()
         self.add_enemy()
 
+    def check_if_enough_hits(self):
+        if self.hits > 250:
+            self.lost = True
+
     def update(self):
         self.frames += 1
         self.player.update()
@@ -138,6 +142,7 @@ class Individual_Instance:
         if self.get_first_enemy().enemy_hitted:
             self.reduce_live()
         self.check_lost()
+        self.check_if_enough_hits()
 
     def draw(self, screen: pygame.Surface):
         self.player_ship.lasers.draw(screen)

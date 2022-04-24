@@ -10,10 +10,12 @@ class Enemy(pygame.sprite.Sprite):
         super().__init__()
         image = pygame.image.load('assets/weak-enemy.png')
         self.image = scale_image(image, 1/2)
-        self.rect = self.image.get_rect(midtop=(x, screen_rect.top))
+        self.screen_rect = screen_rect
+        self.rect = self.image.get_rect(midtop=(x, self.screen_rect.top))
         self.mask = pygame.mask.from_surface(self.image)
-        self.MAX_FRAMES_HIT = (screen_rect.width / ship_speed) * 2
-        self.MAX_FRAMES_CHANGE_DIRECTION = (screen_rect.width / ship_speed)
+        self.MAX_FRAMES_HIT = (self.screen_rect.width / ship_speed) * 2
+        self.MAX_FRAMES_CHANGE_DIRECTION = (
+            self.screen_rect.width / ship_speed)
         self.last_shot = frames
         self.last_change_direction = frames
         self.speed = self.MAX_SPEED
@@ -21,6 +23,10 @@ class Enemy(pygame.sprite.Sprite):
 
     def move(self):
         self.rect.x += self.speed
+        if self.rect.right >= self.screen_rect.right:
+            self.rect.right = self.screen_rect.right
+        elif self.rect.left <= self.screen_rect.left:
+            self.rect.left = self.screen_rect.left
 
     def update(self, frames):
         self.enemy_hit(frames)
