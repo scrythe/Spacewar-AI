@@ -23,16 +23,16 @@ def make_create_random_x_coord_func(screen_rect: pygame.Surface):
 class Individual_Instance:
     MAX_LIVES = 1
 
-    def __init__(self, genome: neat.DefaultGenome, config, screen_rect: pygame.Rect, first_10_x_pos):
+    def __init__(self, genome: neat.DefaultGenome, config, screen_rect: pygame.Rect, first_6_pos, star):
         self.genome = genome
         self.net = neat.nn.FeedForwardNetwork.create(self.genome, config)
         self.screen_rect = screen_rect
-        self.array_of_x_coords = first_10_x_pos
+        self.array_of_x_coords = first_6_pos
         self.array_x_coords_index = 0
         self.create_random_x_coord = make_create_random_x_coord_func(
             self.screen_rect)
         self.player = pygame.sprite.GroupSingle(
-            Ship(self.screen_rect, self.create_random_x_coord()))
+            Ship(self.screen_rect, star))
         self.player_ship: Ship = self.player.sprite
 
         self.x_coord = randint(self.screen_rect.left, self.screen_rect.right)

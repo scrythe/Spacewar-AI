@@ -11,12 +11,16 @@ def create_rect(image: pygame.Surface, screen_rect: pygame.Rect):
 
 class Ship(pygame.sprite.Sprite):
     SPEED = 5
-    MAX_AMMO = 3
+    MAX_AMMO = 1
     SHOT_DELAY = 250
 
-    def __init__(self, screen_rect: pygame.Rect, x):
+    def __init__(self, screen_rect: pygame.Rect, star):
         super().__init__()
         image = pygame.image.load('assets/spaceship.png').convert_alpha()
+        if star:
+            image = pygame.image.load(
+                'assets/spaceship-star.png').convert_alpha()
+
         self.image = scale_image(image, 1/4)
         self.screen_rect = screen_rect
         self.rect = create_rect(self.image, self.screen_rect)

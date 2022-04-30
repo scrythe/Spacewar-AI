@@ -13,7 +13,7 @@ class Enemy(pygame.sprite.Sprite):
         self.screen_rect = screen_rect
         self.rect = self.image.get_rect(midtop=(x, self.screen_rect.top))
         self.mask = pygame.mask.from_surface(self.image)
-        self.MAX_FRAMES_HIT = (self.screen_rect.width / ship_speed) * 2
+        self.MAX_FRAMES_HIT = (self.screen_rect.width / ship_speed) * 1.5
         self.MAX_FRAMES_CHANGE_DIRECTION = (
             self.screen_rect.width / ship_speed)
         self.last_shot = frames
@@ -35,8 +35,8 @@ class Enemy(pygame.sprite.Sprite):
 
     def change_direction(self, frames):
         if self.last_change_direction + self.MAX_FRAMES_CHANGE_DIRECTION < frames:
-            change_direction = randint(0, 1)
-            if change_direction:
+            change_direction = randint(0, 100)
+            if change_direction > 50:
                 self.speed *= -1
                 self.last_change_direction = frames
 

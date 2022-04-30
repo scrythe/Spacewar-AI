@@ -19,17 +19,38 @@ def fill_background(screen_size):
     return background
 
 
-def create_and_game_population(genomes, config, screen_rect):
-    first_10_pos = [800, 400, 700, 300, 900, 500, 200, 400, 900, 1000]
+def create_and_game_population(genomes, config, screen_rect: pygame.Rect):
+    half_screen = screen_rect.width / 2
+    first_6_pos = [half_screen - (half_screen / 3), half_screen + (half_screen / 3),
+                   half_screen - (half_screen / 2), half_screen + (half_screen / 2), screen_rect.left, screen_rect.right]
 
+    sort_by_worst_fitness(genomes)
     ai_game_population: List[Individual_Instance] = []
+    best_genome = determine_best_genome_id(genomes)
     for genome_id, genome in genomes:
         genome: neat.DefaultGenome
+        star = genome_id == best_genome
         individual_instance = Individual_Instance(
-            genome, config, screen_rect, first_10_pos)
+            genome, config, screen_rect, first_6_pos, star)
         ai_game_population.append(individual_instance)
 
     return ai_game_population
+
+
+def sort_by_worst_fitness(genomes):
+    for genome_id, genome in genomes:
+        if genome.fitness == None:
+            genome.fitness = 0
+
+    def key(genome: tuple[int, neat.DefaultGenome]
+            ): return genome[1].fitness
+    genomes.sort(key=key)  # no reverse because draw worst first
+
+
+def determine_best_genome_id(genomes):
+    # best genome is at bottom
+    best_genome: tuple[int, neat.DefaultGenome] = genomes[-1]
+    return best_genome[0]
 
 
 class Population_Game:
